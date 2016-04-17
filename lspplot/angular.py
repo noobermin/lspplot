@@ -11,7 +11,8 @@ from cmaps import pastel_clear,plasma_clear,viridis_clear,magma_clear_r;
 import re;
 
 def angular_load(
-        fname,F=None,normalize=False,polar=False, keV=False):
+        fname,F=None,normalize=False,polar=False,
+        keV=False,abs_charges=True):
     '''
     load the pext data and normalize
 
@@ -33,7 +34,9 @@ def angular_load(
         e/=1e3;
     else:
         e/=1e6;
-    s = -d['q']*1e6;
+    s = d['q']*1e6;
+    if abs_charges:
+        s=np.abs(s);
     if F is not None: s*=F;
     if normalize:
          kw = normalize

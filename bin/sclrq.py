@@ -66,7 +66,7 @@ title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6);
 r=pc(
     q,(x,y), lims=(mx,mn),log=opts['--log10'],
     clabel=units, title=title,
-    agg=True);
+    agg=not opts['--show']);
 highlight(
     r, myhi,
     color="lightyellow", alpha=0.5);

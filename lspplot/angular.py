@@ -152,14 +152,6 @@ def angular(s, phi, e,
     norm = matplotlib.colors.LogNorm() if test(kw,'log_q') else None;
     surf=plt.pcolormesh(PHI,E,S,norm=norm, cmap=cmap,vmin=minQ,vmax=maxQ);
     #making radial guides. rgrids only works for plt.polar calls
-    full_phi = np.linspace(0.0,2*np.pi,100);
-    for i in np.arange(0.0,maxE,Estep)[1:]:
-        plt.plot(full_phi,np.ones(full_phi.shape)*i,
-                 c='gray',alpha=0.9,
-                 lw=1, ls='--');
-    ax.set_theta_zero_location('N');
-    ax.patch.set_alpha(0.0);
-    ax.set_axis_bgcolor('red');
     #making rgrid
     if test(kw, 'rgridopts'):
         ropts = kw['rgridopts'];
@@ -175,6 +167,10 @@ def angular(s, phi, e,
             rsize = ropts['size'];
         else:
             rsize = 10.5;
+        if test(ropts, 'color'):
+            gridc=ropts['color'];
+        else:
+            gridc='gray';
         if test(ropts, 'invert'):
             c1,c2 = "w","black";
         else:
@@ -184,6 +180,16 @@ def angular(s, phi, e,
         rangle = 45;
         rsize = 10.5;
         c1,c2 = "black","w";
+        gridc = "gray";
+
+    full_phi = np.linspace(0.0,2*np.pi,100);
+    for i in np.arange(0.0,maxE,Estep)[1:]:
+        plt.plot(full_phi,np.ones(full_phi.shape)*i,
+                 c=gridc, alpha=0.9,
+                 lw=1, ls='--');
+    ax.set_theta_zero_location('N');
+    ax.patch.set_alpha(0.0);
+    ax.set_axis_bgcolor('red');
     rlabel_str = '{} ' + runit;
     rlabels    = np.arange(0.0,maxE,Estep)[1:];
     _,ts=plt.rgrids(rlabels,

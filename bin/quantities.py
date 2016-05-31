@@ -92,7 +92,7 @@ if __name__ == "__main__":
         angleopt = None;
     KE, good = totalKE(d, ecut, angleopt, return_bools=True);
     LE = laserE(E_0, T, w, dim=dim);
-    totalq = d['q'][good].sum()*1e12;
+    totalq = d['q'][good].sum()*1e6;
     print('total charge: {:e} {}'.format(totalq,'pC/cm' if opts['--2D'] else 'pC'));
     print("total energy: {:e} J".format(KE));
     print('pulse energy: {:e} J'.format(LE));

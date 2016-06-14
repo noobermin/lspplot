@@ -16,36 +16,39 @@ Options:
   --keV -k                    Scale by 100s of KeV instead of MeV.
   --max-e=MAXE -e MAXE        Set the maximum energy value (in units depending on --keV flag)
   --e-step=ESTEP              Set the step of grid lines for Energy.
-  --high-res -H               Output a high resolution plt.
+  --high-res -H               Output a high resolution plot.
   --max-q=MAXQ -q MAXQ        Set the maximum for the charge (pcolormesh's vmax value).
   --min-q=MINQ                Set a minimum charge.
-  --normalize -n              Normalize the histogram to 1 *eV^-1 rad^-1 .
+  --normalize -n              Normalize the histogram to MeV^-1 rad^-1 .
   --factor=F -f F             Multiply histogram by F. [default: 1.0]
   --polar -p                  Plot polar angles, letting the east direction be forward.
   --oap=ANGLE -o ANGLE        Set the width angle of the OAP. [default: 50.47]
+  --oap-min=E                 Specify the minimum energy of the OAP. [default: 0.12];
   --log10 -l                  Plot a logarithmic pcolor instead of a linear one.
   --cmap=CMAP                 Use the following cmap [default: viridis].
   --e-direction=ANGLE         The angle for the radial labels.
   --e-units=UNIT              The units for the radial labels.
-  --agg                       Use the agg backend.
+  --agg -A                    Use the agg backend.
+  --lsp -L                    Search for the lsp file in the current directory.
+  --efficiency=E              Calculate the efficiency and display it, pass a tuple
+                              of the energy cut.
 '''
 
 from docopt import docopt;
 import numpy as np;
-from lspplot.angular import angular,_prep;
+from lspplot.angular import angular,_prep2;
 import matplotlib.pyplot as plt
 
-if __name__ == "__main__":
-    opts=docopt(__doc__,help=True);
-    s,phi,e,kw,_ = _prep(opts);
-    if opts['<output>'] and opts['--agg']:
-        plt.switch_backend('agg');
-    angular(s,phi,e,**kw);
-    if opts['<output>']:
-        if opts['--high-res']:
-            plt.savefig(opts['<output>'],dpi=1000);
-        else:
-            plt.savefig(opts['<output>']);
+opts=docopt(__doc__,help=True);
+d,kw = _prep2(opts);
+if opts['<output>'] and opts['--agg']:
+    plt.switch_backend('agg');
+angular(d,**kw);
+if opts['<output>']:
+    if opts['--high-res']:
+        plt.savefig(opts['<output>'],dpi=1000);
     else:
-        plt.show();    
-    pass;
+        plt.savefig(opts['<output>']);
+else:
+    plt.show();    
+pass;

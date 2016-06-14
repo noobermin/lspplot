@@ -1,4 +1,5 @@
 '''physics'''
+import numpy as np;
 e0 = 8.85418782e-12;
 c = 2.99792458e8;
 e = 1.60217657e-19

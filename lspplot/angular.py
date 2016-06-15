@@ -5,6 +5,7 @@ import numpy as np;
 import matplotlib;
 import matplotlib.pyplot as plt;
 import matplotlib.patheffects as pe;
+from lspreader.dotlsp import getdim;
 from matplotlib import colors;
 from pys import test,mk_getkw,parse_ftuple,sd;
 from cmaps import pastel_clear,plasma_clear,viridis_clear,magma_clear_r;
@@ -18,21 +19,15 @@ def _getlsp(path=None):
                  os.listdir(".")
                  if re.search(".*\.lsp$", f)][0];
     with open(path,'r') as f:
-        lines = f.read()
-    getrx = lambda rx:float(re.search(rx,lines,flags=re.MULTILINE).group(1));
+        lsp = f.read()
+    getrx = lambda rx:float(re.search(rx,lsp,flags=re.MULTILINE).group(1));
     I = getrx("intensity=(.*) W/cm\^2 *$");
     #FWHM so divide by 2
     T =getrx("FWHM *\n *independent_variable_multiplier *(.*)$")*1e-9/2.0;    
     w =getrx(
         "\\lambda *spotsize *\n *coefficients [0-9e\-\.]+ *(.*) *end$")*1e-2;
-    xcells = getrx("x-cells *([0-9]+)");
-    ycells = getrx("y-cells *([0-9]+)");
-    zcells = getrx("z-cells *([0-9]+)");
-    dims=0;
-    if xcells > 0:dims+=1;
-    if ycells > 0:dims+=1;
-    if zcells > 0:dims+=1;
-    dim="{}D".format(dims);
+    dim="{}D".format(
+        len(getdim(lsp)));
     return I,w,T,dim;
 
 def totalKE(d, ecut=0, anglecut=None,return_bools=False):
@@ -282,11 +277,12 @@ def angular(d, phi=None, e=None,
                 ecut=0, anglecut=None);
             effd=sd(defeff,**kw['efficiency']);
             minr = effd['ecut'] * (1e-3 if kev else 1e-6);
-            LE=laserE(I=effd['I'],w=effd['w'],T=effd['T']);
-            KE,good=totalKE(d,ecut = effd['ecut'],anglecut=(oap/np.pi*180,effd['dim']),
-                       return_bools=True)
+            dim = effd['dim'];
+            LE=laserE(I=effd['I'],w=effd['w'],T=effd['T'],dim=dim);
+            KE,good=totalKE(
+                d, ecut=effd['ecut'], anglecut=(oap/np.pi*180,dim),
+                return_bools=True)
             totalq = np.abs(d['q'][good]).sum()*1e6;
-            dim = "3D" if not effd['anglecut'] else effd['anglecut'][1];
             def texs(f,l=2):
                 tenpow=int(np.floor(np.log10(f)));
                 nfmt = "{{:0.{}f}}".format(l) + "\\cdot 10^{{{}}}"

@@ -10,7 +10,7 @@ from matplotlib import colors;
 from pys import test,mk_getkw,parse_ftuple,sd;
 from cmaps import pastel_clear,plasma_clear,viridis_clear,magma_clear_r;
 import re;
-from physics import laserE;
+from physics import laserE, a0;
 
 def _getlsp(path=None):
     if not path:
@@ -26,9 +26,11 @@ def _getlsp(path=None):
     T =getrx("FWHM *\n *independent_variable_multiplier *(.*)$")*1e-9/2.0;    
     w =getrx(
         "\\lambda *spotsize *\n *coefficients [0-9e\-\.]+ *(.*) *end$")*1e-2;
+    l =getrx(
+        "\\lambda *spotsize *\n *coefficients ([0-9e\-\.]+) *.* *end$")*1e-2;
     dim="{}D".format(
         len(getdim(lsp)));
-    return I,w,T,dim;
+    return I,w,l,T,dim;
 
 def totalKE(d, ecut=0, anglecut=None,return_bools=False):
     '''
@@ -273,9 +275,11 @@ def angular(d, phi=None, e=None,
         maxr  = maxE*.99;
         if test(kw, 'efficiency') and structd:
             defeff = dict(
-            I=3e18,w=None,T=None,
+                I=3e18,w=None,T=None,l=None,
                 ecut=0, anglecut=None);
             effd=sd(defeff,**kw['efficiency']);
+            if effd['ecut'] == 'wilks':
+                effd['ecut'] = (np.sqrt(1+a0(effd['I'],l=effd['l']*1e2)**2/2.0) - 1.0)*effd['massE'];
             minr = effd['ecut'] * (1e-3 if kev else 1e-6);
             dim = effd['dim'];
             LE=laserE(I=effd['I'],w=effd['w'],T=effd['T'],dim=dim);
@@ -417,19 +421,19 @@ def _prepkw(opts):
     if opts['--normalize']:
         kw['clabel'] += defaults['norm_units'];
     if opts['--lsp'] and opts['--efficiency']:
-        I,w,T,dim = _getlsp();
-        ecut = float(opts['--efficiency']);
-        if kev:
-            ecut*=1e3;
-        else:
-            ecut*=1e6;
+        massE=float(opts['--massE']);
+        I,w,l,T,dim = _getlsp();
+        ecut = opts['--efficiency']
+        if ecut != 'wilks':
+            ecut = float(opts['--efficiency']);
+            if kev:
+                ecut*=1e3;
+            else:
+                ecut*=1e6;
         kw['efficiency'] = dict(
-            I=I,w=w,T=T,dim=dim,
-            ecut=ecut);
+            I=I,w=w,T=T,l=l,dim=dim,
+            ecut=ecut, massE=massE);
     return kw;
-
-
-
 
 def _str2cmap(i):    
     if i == 'viridis_clear':

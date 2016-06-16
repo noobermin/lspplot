@@ -25,6 +25,7 @@ Options:
   --factor=F -f F             Multiply histogram by F. [default: 1.0]
   --polar -p                  Plot polar angles, letting the east direction be forward.
   --oap=ANGLE -o ANGLE        Set the width angle of the OAP. [default: 50.47]
+  --massE=E                   Set the mass of the particles for efficiency in eV. [default: 0.511e6]
   --log10 -l                  Plot a logarithmic pcolor instead of a linear one.
   --cmap=CMAP                 Use the following cmap [default: viridus].
   --e-direction=ANGLE         The angle for the radial labels.

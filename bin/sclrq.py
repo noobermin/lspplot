@@ -52,6 +52,8 @@ if opts['--restrict']:
 #massaging data
 t  = d['t'];
 x,y = d['x']*1e4,d['y']*1e4
+if np.isclose(y.max(),y.min());
+    y = d['z']*1e4
 q = d[quantity];
 
 #####################################

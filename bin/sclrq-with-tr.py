@@ -64,7 +64,8 @@ if opts['--traj']:
     with np.load(opts['--traj'], mmap_mode='r') as f:
         if factor:
             tri = i*factor+offset;
-            if not np.isclose(f['time'][tri],t):
+            trt = f['time'][tri];
+            if not np.isclose(trt,t):
                 import sys
                 sys.stderr.write(
                     "warning: time from trajectory is {} while time from sclr is {}\n".format(

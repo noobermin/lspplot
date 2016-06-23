@@ -10,6 +10,7 @@ Usage:
 Options:
     --help -h
     --show -s           Show
+    --verbose -v        Make some noise.
     --nozip -U          flds are NOT gzipped.
     --log10 -l          Log it.
     --lims=LIM          Set lims [default: (1e2,6e8)]
@@ -75,6 +76,8 @@ if opts['--traj']:
         tr = f['data'][:tri+1,:];
     if opts['--traj-n']:
         tr = tr[:,:int(opts['--traj-n'])];
+    if opts['--verbose']:
+        print("size of trajectories: {}".format(tr.shape));
     pass;
 if opts['--restrict']:
     res = parse_ituple(opts['--restrict'],length=None);

@@ -80,6 +80,7 @@ if opts['--traj']:
     if opts['--verbose']:
         print("size of trajectories: {}".format(tr.shape));
         print("final time is {}".format(trt));
+        print("with sclr time as {}".format(t));
     pass;
 if opts['--restrict']:
     res = parse_ituple(opts['--restrict'],length=None);
@@ -121,7 +122,11 @@ if opts['--traj']:
     tr[coords[1]]*=1e4;
     tr[coords[0]]*=1e4;
     for itr in np.rollaxis(tr,1):
-        plt.plot(itr[coords[1]],itr[coords[0]]);
+        plt.plot(
+            itr[coords[1]],itr[coords[0]],
+            color='black',
+            lw=0.1,
+            alpha=0.5);
 if opts['--show']:
     plt.show();
 else:

@@ -72,7 +72,7 @@ if opts['--traj']:
                     "warning: time from trajectory is {} while time from sclr is {}\n".format(
                         trt,t));
         else:
-            tri = len(f['time'] <= t);
+            tri = np.sum((f['time'] <= t).astype(int));
             trt = f['time'][tri];
         tr = f['data'][:tri+1,:];
     if opts['--traj-n']:

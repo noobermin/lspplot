@@ -72,12 +72,14 @@ if opts['--traj']:
                     "warning: time from trajectory is {} while time from sclr is {}\n".format(
                         trt,t));
         else:
-            tri = np.argmax(np.isclose(f['time'],t))
+            tri = len(f['time'] <= t);
+            trt = f['time'][tri];
         tr = f['data'][:tri+1,:];
     if opts['--traj-n']:
         tr = tr[:,:int(opts['--traj-n'])];
     if opts['--verbose']:
         print("size of trajectories: {}".format(tr.shape));
+        print("final time is {}".format(trt));
     pass;
 if opts['--restrict']:
     res = parse_ituple(opts['--restrict'],length=None);

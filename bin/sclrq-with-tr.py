@@ -116,6 +116,8 @@ if opts['--laser']:
     
 import matplotlib.pyplot as plt;
 if opts['--traj']:
+    tr[coords[1]]*=1e4;
+    tr[coords[0]]*=1e4;
     for itr in np.rollaxis(tr,1):
         plt.plot(itr[coords[1]],itr[coords[0]]);
 if opts['--show']:

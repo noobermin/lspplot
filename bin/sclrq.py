@@ -12,8 +12,8 @@ Options:
     --show -s           Show
     --nozip -U          flds are NOT gzipped.
     --log10 -l          Log it.
-    --lims=LIM          Set lims [default: (1e2,6e8)]
-    --highlight=H       Set highlight [default: 3e8]
+    --lims=LIM          Set lims [default: (1e18,1e23)]
+    --highlight=H       Set highlight.
     --quantity=Q -Q Q   Render this quantity [default: RhoN10]
     --dir=D -D D        Read from this dir [default: .]
     --restrict=R        Restrict it.
@@ -61,7 +61,7 @@ q = d[quantity];
 
 #getting options from user
 mn,mx = parse_ftuple(opts['--lims'],length=2);
-myhi  = float(opts['--highlight']);
+
 
 #plot the density
 title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6);
@@ -69,9 +69,12 @@ r=pc(
     q,(x,y), lims=(mx,mn),log=opts['--log10'],
     clabel=units, title=title,
     agg=not opts['--show']);
-highlight(
-    r, myhi,
-    color="lightyellow", alpha=0.5);
+
+if opts['--highlight']:
+    myhi  = float(opts['--highlight']);
+    highlight(
+        r, myhi,
+        color="lightyellow", alpha=0.5);
 
 if opts['--laser']:
     laser = S(d);

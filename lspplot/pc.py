@@ -8,7 +8,7 @@ from lspreader import flds as fldsm;
 from lspreader.lspreader import get_header;
 import numpy as np;
 import numpy.linalg as lin;
-from pys import parse_ftuple,test,takef;
+from pys import parse_ftuple,test,takef,mk_getkw;
 from consts import *
 
 pc_defaults = {
@@ -72,3 +72,41 @@ def highlight(ret, val,
     if q is ret['q']:
         cbar.add_lines(ct);
     return ret;
+
+trajdefaults = dict(
+    alpha = 0.15,
+    coords= ['y','x'],
+    color = 'black',
+    no_resize=False,
+    cmap='plasma',
+    color_quantity=None,
+    marker='o',
+    size=1,
+    lw=0,
+);
+    
+def trajectories(ret,trajs,**kw):
+    getkw=mk_getkw(trajdefaults, kw);
+    x,y = getkw("coords");
+    if not test(kw, "no_resize"):
+        xlim, ylim = ret['axes'].get_xlim(), ret['axes'].get_ylim();
+    if getkw("color_quantity"):
+        plotit = lambda itr: ret['axes'].plot(
+            itr[x], itr[y],
+            c=getkw('color'),alpha=getkw('alpha'));
+        pass;
+    else:
+        cf = getkw('color_quantity');
+        if type(cf) == str:
+            cf = lambda itr: itr[cf];
+        plotit = lambda itr: ret['axes'].scatter(
+            itr[x], itr[y],
+            c=c(itr),
+            lw=getkw('lw'),
+            s=getkw('size'),
+            cmap=getkw('cmap'));
+    for itr in np.rollaxis(tr,1):
+        plotit(itr);
+    if not test(kw, "no_resize"):
+        ret['axes'].set_xlim(xlim);
+        ret['axes'].set_ylim(ylim);

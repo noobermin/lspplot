@@ -31,6 +31,10 @@ Options:
                         used, script will search for the closest time in the trajectory
                         file.
     --traj-n=N          Plot only first N trajectories.
+    --traj-energy       Color the trajectory lines by their energy.
+    --traj-log          Logarithmic color for trajectories.
+    --traj-maxE=E       Set the maximum E explicitly. If set, anything above will be 
+                        cut off.
 '''
 from docopt import docopt;
 import numpy as np;
@@ -118,10 +122,25 @@ if opts['--laser']:
               color="red", alpha=0.15);
     
 import matplotlib.pyplot as plt;
+massE = .511e6
+energy=lambda itr: massE*(np.sqrt(itr['ux']**2+itr['uy']**2+itr['uz']**2+1)-1)
 if opts['--traj']:
     tr[coords[1]]*=1e4;
     tr[coords[0]]*=1e4;
-    trajectories(r, tr);
+    if opts['--traj-energy']:
+        #find max energy
+        if opts['--traj-maxE']:
+            maxE=float(opts['--traj-maxE']);
+            def _cf(itr):
+                E = energy(itr);
+                return np.where(E>maxE, 1.0, E/maxE)
+            cf = _cf;
+        else:
+            maxE=np.max(energy(tr));
+            cf = lambda itr: energy(itr)/maxE;
+    else:
+        cf = None;
+    trajectories(r, tr, color_quantity=cf);
 if opts['--show']:
     plt.show();
 else:

@@ -86,7 +86,7 @@ trajdefaults = dict(
 );
     
 def trajectories(ret,trajs,**kw):
-    getkw=mk_getkw(trajdefaults, kw);
+    getkw=mk_getkw(kw, trajdefaults);
     x,y = getkw("coords");
     if not test(kw, "no_resize"):
         xlim, ylim = ret['axes'].get_xlim(), ret['axes'].get_ylim();

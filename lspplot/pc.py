@@ -90,7 +90,7 @@ def trajectories(ret,trajs,**kw):
     x,y = getkw("coords");
     if not test(kw, "no_resize"):
         xlim, ylim = ret['axes'].get_xlim(), ret['axes'].get_ylim();
-    if not getkw("color_quantity"):
+    if not test(kw,"color_quantity"):
         plotit = lambda itr: ret['axes'].plot(
             itr[x], itr[y],
             lw=0.1,

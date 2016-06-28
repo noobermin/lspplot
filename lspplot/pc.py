@@ -106,7 +106,7 @@ def trajectories(ret,trajs,**kw):
             lw=getkw('lw'),
             s=getkw('size'),
             cmap=getkw('cmap'));
-    for itr in np.rollaxis(tr,1):
+    for itr in np.rollaxis(trajs,1):
         plotit(itr);
     if not test(kw, "no_resize"):
         ret['axes'].set_xlim(xlim);

@@ -128,13 +128,16 @@ if opts['--traj']:
     tr[coords[1]]*=1e4;
     tr[coords[0]]*=1e4;
     if opts['--traj-energy']:
-        energy=lambda itr: massE*(np.sqrt(itr['ux']**2+itr['uy']**2+itr['uz']**2+1)-1)
+        en=lambda itr: massE*(np.sqrt(itr['ux']**2+itr['uy']**2+itr['uz']**2+1)-1)
         if opts['--traj-E-log']:
             minE = float(opts['--traj-minE']);
-            energyl=lambda itr: np.log10(massE*(np.sqrt(itr['ux']**2+itr['uy']**2+itr['uz']**2+1)-1))
+            def _energy(itr):
+                E = en(itr);
+                return np.log10(
+                    np.where(E < minE, minE, E));
+            energy=_energy;
         else:
-
-        
+            energy=en;
         #find max energy
         if opts['--traj-maxE']:
             maxE=float(opts['--traj-maxE']);

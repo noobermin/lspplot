@@ -32,7 +32,7 @@ Options:
                         file.
     --traj-n=N          Plot only first N trajectories.
     --traj-energy       Color the trajectory lines by their energy.
-    --traj-log          Logarithmic color for trajectories.
+    --traj-E-log        Logarithmic color for trajectories.
     --traj-maxE=E       Set the maximum E explicitly. If set, anything above will be 
                         cut off.
 '''
@@ -123,11 +123,15 @@ if opts['--laser']:
     
 import matplotlib.pyplot as plt;
 massE = .511e6
-energy=lambda itr: massE*(np.sqrt(itr['ux']**2+itr['uy']**2+itr['uz']**2+1)-1)
 if opts['--traj']:
     tr[coords[1]]*=1e4;
     tr[coords[0]]*=1e4;
     if opts['--traj-energy']:
+        if opts['--traj-E-log']:
+            energy=lambda itr: np.log10(massE*(np.sqrt(itr['ux']**2+itr['uy']**2+itr['uz']**2+1)-1))
+        else:
+            energy=lambda itr: massE*(np.sqrt(itr['ux']**2+itr['uy']**2+itr['uz']**2+1)-1)
+        
         #find max energy
         if opts['--traj-maxE']:
             maxE=float(opts['--traj-maxE']);

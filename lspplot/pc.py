@@ -102,7 +102,7 @@ def trajectories(ret,trajs,**kw):
             cf = lambda itr: itr[cf];
         plotit = lambda itr: ret['axes'].scatter(
             itr[x], itr[y],
-            c=c(itr),
+            c=cf(itr),
             lw=getkw('lw'),
             s=getkw('size'),
             cmap=getkw('cmap'));

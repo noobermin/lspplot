@@ -38,7 +38,7 @@ import numpy.linalg as lin;
 from pys import parse_ftuple, parse_ituple;
 from lspreader.flds import read_indexed, restrict
 from lspplot.sclr import S;
-from lspplot.pc import pc,highlight;
+from lspplot.pc import pc,highlight,trajectories;
 from lspplot.consts import c,mu0,e0;
 
 opts = docopt(__doc__,help=True);
@@ -121,12 +121,7 @@ import matplotlib.pyplot as plt;
 if opts['--traj']:
     tr[coords[1]]*=1e4;
     tr[coords[0]]*=1e4;
-    for itr in np.rollaxis(tr,1):
-        plt.plot(
-            itr[coords[1]],itr[coords[0]],
-            color='black',
-            lw=0.1,
-            alpha=0.5);
+    trajectories(r, tr);
 if opts['--show']:
     plt.show();
 else:

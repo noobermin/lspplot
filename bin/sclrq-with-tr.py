@@ -33,8 +33,9 @@ Options:
     --traj-n=N          Plot only first N trajectories.
     --traj-energy       Color the trajectory lines by their energy.
     --traj-E-log        Logarithmic color for trajectories.
-    --traj-maxE=E       Set the maximum E explicitly. If set, anything above will be 
-                        cut off.
+    --traj-maxE=E       Set the maximum E in eV explicitly. If set, anything above
+                        will be cut off.
+    --traj-minE=E       Set the minimum E in eV. [default: 1]
 '''
 from docopt import docopt;
 import numpy as np;
@@ -127,10 +128,12 @@ if opts['--traj']:
     tr[coords[1]]*=1e4;
     tr[coords[0]]*=1e4;
     if opts['--traj-energy']:
+        energy=lambda itr: massE*(np.sqrt(itr['ux']**2+itr['uy']**2+itr['uz']**2+1)-1)
         if opts['--traj-E-log']:
-            energy=lambda itr: np.log10(massE*(np.sqrt(itr['ux']**2+itr['uy']**2+itr['uz']**2+1)-1))
+            minE = float(opts['--traj-minE']);
+            energyl=lambda itr: np.log10(massE*(np.sqrt(itr['ux']**2+itr['uy']**2+itr['uz']**2+1)-1))
         else:
-            energy=lambda itr: massE*(np.sqrt(itr['ux']**2+itr['uy']**2+itr['uz']**2+1)-1)
+
         
         #find max energy
         if opts['--traj-maxE']:
@@ -144,7 +147,9 @@ if opts['--traj']:
             cf = lambda itr: energy(itr)/maxE;
     else:
         cf = None;
-    trajectories(r, tr, color_quantity=cf);
+    trajectories(r, tr,
+                 coords = list(reversed(coords)),
+                 color_quantity=cf);
 if opts['--show']:
     plt.show();
 else:

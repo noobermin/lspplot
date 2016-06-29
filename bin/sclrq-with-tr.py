@@ -152,6 +152,7 @@ if opts['--traj']:
         cf = None;
     trajectories(r, tr,
                  coords = list(reversed(coords)),
+                 cmap='magma',
                  color_quantity=cf);
 if opts['--show']:
     plt.show();

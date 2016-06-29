@@ -152,13 +152,9 @@ if opts['--traj']:
     else:
         cf = None;
     #massaging alpha
-    maxq=np.log10(np.max(tr['q'][0,:]));
+    maxq=np.log10(np.max(np.abs(tr['q'])[:,0]));
     print(maxq);
-    def alphaf(itr):
-        r=np.log10(itr['q'][0])/maxq
-        print(r);
-        quit();
-    #alphaf = lambda itr: np.log10(itr['q'][0])/maxq
+    alphaf = lambda itr: np.log10(np.abs(itr['q'])[0])/maxq
     trajectories(
         r, tr,
         alpha=alphaf,

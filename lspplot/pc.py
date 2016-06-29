@@ -101,7 +101,7 @@ def trajectories(ret,trajs,**kw):
             itr[x], itr[y],
             lw=getkw('lw'),
             alpha=af(itr),
-            c=getkw('color'),
+            c=getkw('color'),);
         pass;
     else:
         cf = getkw('color_quantity');

@@ -74,7 +74,7 @@ def highlight(ret, val,
     return ret;
 
 trajdefaults = dict(
-    alpha = 0.15,
+    alpha = 0.25,
     coords= ['y','x'],
     color = 'black',
     no_resize=False,
@@ -105,6 +105,7 @@ def trajectories(ret,trajs,**kw):
             c=cf(itr),
             lw=getkw('lw'),
             s=getkw('size'),
+            alpha=getkw('alpha'),
             cmap=getkw('cmap'));
     for itr in np.rollaxis(trajs,1):
         plotit(itr);

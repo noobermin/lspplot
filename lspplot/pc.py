@@ -74,15 +74,15 @@ def highlight(ret, val,
     return ret;
 
 trajdefaults = dict(
-    alpha = 0.25,
+    alpha = None,
     coords= ['y','x'],
     color = 'black',
     no_resize=False,
-    cmap='plasma',
+    cmap=None,
     color_quantity=None,
     marker='o',
     size=1,
-    lw=0,
+    lw=0.1,
 );
     
 def trajectories(ret,trajs,**kw):
@@ -90,11 +90,18 @@ def trajectories(ret,trajs,**kw):
     x,y = getkw("coords");
     if not test(kw, "no_resize"):
         xlim, ylim = ret['axes'].get_xlim(), ret['axes'].get_ylim();
+    alpha = getkw('alpha');
+    af = alpha;
+    if alpha is None:
+        af = lambda itr: None;
+    elif type(alpha) == float:
+        af = lambda itr: alpha;
     if not test(kw,"color_quantity"):
         plotit = lambda itr: ret['axes'].plot(
             itr[x], itr[y],
-            lw=0.1,
-            c=getkw('color'),alpha=getkw('alpha'));
+            lw=getkw('lw'),
+            alpha=af(itr),
+            c=getkw('color'),
         pass;
     else:
         cf = getkw('color_quantity');
@@ -105,8 +112,9 @@ def trajectories(ret,trajs,**kw):
             c=cf(itr),
             lw=getkw('lw'),
             s=getkw('size'),
-            alpha=getkw('alpha'),
+            alpha=af(itr),
             cmap=getkw('cmap'));
+    
     for itr in np.rollaxis(trajs,1):
         plotit(itr);
     if not test(kw, "no_resize"):

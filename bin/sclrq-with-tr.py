@@ -123,12 +123,13 @@ if opts['--laser']:
               color="red", alpha=0.15);
     
 import matplotlib.pyplot as plt;
+gm = lambda itr: np.sqrt(itr['ux']**2+itr['uy']**2+itr['uz']**2+1);
 massE = .511e6
 if opts['--traj']:
     tr[coords[1]]*=1e4;
     tr[coords[0]]*=1e4;
     if opts['--traj-energy']:
-        en=lambda itr: massE*(np.sqrt(itr['ux']**2+itr['uy']**2+itr['uz']**2+1)-1)
+        en = lambda itr:np.nan_to_num(massE*(gm(itr)-1));
         if opts['--traj-E-log']:
             minE = float(opts['--traj-minE']);
             def _energy(itr):
@@ -150,10 +151,16 @@ if opts['--traj']:
             cf = lambda itr: energy(itr)/maxE;
     else:
         cf = None;
-    trajectories(r, tr,
-                 coords = list(reversed(coords)),
-                 cmap='magma',
-                 color_quantity=cf);
+    #massaging alpha
+    maxq=np.log10(max(np.tr['q'][:,0]));
+    alphaf = lambda itr: log10(itr['q'][0])/maxq
+    trajectories(
+        r, tr,
+        alpha=alphaf,
+        lw=0,
+        coords = list(reversed(coords)),
+        cmap   = 'copper',
+        color_quantity=cf);
 if opts['--show']:
     plt.show();
 else:

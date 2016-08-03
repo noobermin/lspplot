@@ -188,21 +188,10 @@ def angular(d, phi=None, e=None,
         mxe = np.max(e);
         tenpow = np.floor(np.log10(mxe))
         maxE = 10**tenpow * (int(mxe/(10**tenpow))+1)
-        Estep = maxE/4.0;
-        if 4.0 > maxE > 2.0:
-            Estep = 1.0;
-        elif 2.0 >= maxE > 1.0:
-            Estep = 0.5;
-        elif Estep < 1.0:
-            Estep = int(Estep/0.25)*0.25;
-        else:
-            #round up Estep to either a multiple of five or two
-            nearest2 = int(Estep / 2.0) * 2;
-            nearest5 = int(Estep / 5.0) * 5;
-            if abs(nearest2 - Estep) < abs(nearest5 - Estep):
-                Estep = nearest2;
-            else:
-                Estep = nearest5;
+        Estep = 10**tenpow;
+        if Estep > 5:
+            Estep = 5*10**tenpow;
+    print(maxE,Estep);
     maxQ  = getkw(kw,'max_q');
     minQ  = getkw(kw,'min_q');
     if test(kw,"normalize"):

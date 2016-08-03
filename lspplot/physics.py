@@ -52,3 +52,6 @@ def laserE(I=None,E_0=None,
 
 zr = lambda lm,w0: w0**2*np.pi/lm
 waist = lambda z,lm,w0: w0*np.sqrt(1+(z/zr(lm,w0))**2)
+
+def maxwellE(E,kT):
+    return 2*np.sqrt(E/np.pi) * (1.0/kT)**1.5 * np.exp(-E/kT)

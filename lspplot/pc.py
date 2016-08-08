@@ -15,10 +15,39 @@ pc_defaults = {
     'xlabel':'microns',
     'ylabel':'microns',
     'title':'',
+    'clabel':'',
 };
 
 
-def pc(q,p,**kw):
+def pc(q,p=None,**kw):
+    '''
+    My (easier) pcolormesh.
+
+    Arguments:
+      q   -- the quantity.
+      p   -- tuple of spatial positions. Optional. If 
+             None, plot by index. Here, x is the "polarization"
+             direction and y is the "transverse" direction.
+             Thus, they are flipped of that of the *cartesian*
+             axes of the array. Can be shaped as q as in pcolormesh.
+             For 1D arrays, we meshgrid them.
+
+    Keywords Arguments:
+      axes   -- use these Axes from matplotlib
+      agg    -- use agg
+      lims   -- set vlims. If not set, vlims are not
+                set for pcolormesh
+      log    -- use log norm
+      xlabel -- set xlabel
+      ylabel -- set ylabel
+      title  -- set title
+      clabel -- set colorbar label
+
+    Returns:
+      A dictionary with axes, pcolormesh object,
+      amongst other things. pass this dict to `highlight`
+      and `trajectories` to plot on the same figure.
+    '''
     def getkw(l):
         if test(kw,l):
             return kw[l];
@@ -40,8 +69,13 @@ def pc(q,p,**kw):
     if test(kw, 'lims'):
         mn, mx = kw['lims'];
     else:
-        mn, mx = 0, 1e2;  
+        mn, mx = None, None
+    if p == None:
+        p = np.arange(q.shape[0]), np.arange(q.shape[1]);
     x,y=p;
+    if len(x.shape)==len(y.shape) and len(y.shape)==1:
+        x,y = np.meshgrid(x,y,indexing='ij');
+        
     ret['q'] = q;
     ret['x'],ret['y'] = x,y;
     mypc = ret['pc'] =ax.pcolormesh(
@@ -58,6 +92,22 @@ def pc(q,p,**kw):
 
 def highlight(ret, val,
               q=None, color='white', alpha=0.15):
+    '''
+    Highlight a pc. Essentially a wrapper of plt.contour
+
+    Arguments:
+      ret   -- dict returned from pc.
+      val   -- value to highlight
+      q     -- quantity to highlight. If None, highlight ret's quantity
+
+    Keyword Arguments:
+      color -- color of highlight
+      alpha -- alpha of highlight
+
+    Returns:
+      ret but with stuff that plt.contour adds.
+    '''
+
     ax = ret['axes'];
     if q is None:
         q = ret['q'];
@@ -86,6 +136,33 @@ trajdefaults = dict(
 );
     
 def trajectories(ret,trajs,**kw):
+    '''
+    Draw trajectories on a pc. I will provide better documentation later. For
+    hints on valid keyword names, look at lspplot.pc.trajdefaults
+
+    Arguments:
+      ret   -- dict returned from pc.
+      trajs -- trajectories in the form created from lspreader's pmovie
+               scheme.
+
+    Keyword Arguments:
+      coords    -- coordinates to plot as list of field names
+      no_resize -- avoid resizing the axes which happens if the
+                   trajectories fall outside of the current axes.
+      lw        -- line width of traj
+      color     -- color of traj
+      cmap      -- colormap of traj
+      color_quantity -- a truly crazy thing. Color quantities by either
+                         1) a particular quantity
+                         2) a function.
+                       If this is a str, assume 1). Otherwise let the
+                       color of the traj be color_quantity(itr) where
+                       itr is a row in trajs. If none, just plot a line.
+
+    Returns:
+      None.
+    '''
+
     getkw=mk_getkw(kw, trajdefaults);
     x,y = getkw("coords");
     if not test(kw, "no_resize"):

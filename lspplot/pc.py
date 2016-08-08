@@ -74,8 +74,7 @@ def pc(q,p=None,**kw):
         p = np.arange(q.shape[0]), np.arange(q.shape[1]);
     x,y=p;
     if len(x.shape)==len(y.shape) and len(y.shape)==1:
-        x,y = np.meshgrid(x,y,indexing='ij');
-        
+        y,x = np.meshgrid(y,x,indexing='ij');
     ret['q'] = q;
     ret['x'],ret['y'] = x,y;
     mypc = ret['pc'] =ax.pcolormesh(

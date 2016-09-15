@@ -187,9 +187,10 @@ def angular(d, phi=None, e=None,
     elif maxE == 'round' or maxE == 'auto':
         mxe = np.max(e);
         tenpow = np.floor(np.log10(mxe))
+        mantissa = np.floor(mxe/(10**tenpow));
         maxE = 10**tenpow * (int(mxe/(10**tenpow))+1)
         Estep = 10**tenpow;
-        if Estep > 5:
+        if mantissa > 5:
             Estep = 5*10**tenpow;
     print(maxE,Estep);
     maxQ  = getkw(kw,'max_q');

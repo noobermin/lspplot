@@ -13,15 +13,18 @@ Options:
   --rtitle=TITLE -T TITLE     Set the right title.
   --clabel=CLABEL -c CLABEL   Set colorbar label. [default: $p C$]
   --no-cbar                   Turn off the colorbar.
-  --keV -k                    Scale by 100s of KeV instead of MeV.
-  --max-e=MAXE -e MAXE        Set the maximum energy value (in units depending on --keV flag)
-  --e-step=ESTEP              Set the step of grid lines for Energy.
+  --keV -k                    Use KeV. Included for backwards compatibility.
+  --energy-units=UNITS        Set the energy units. Options are MeV, KeV, and eV [default: MeV]
+  --max-e=MAXE -e MAXE        Set the maximum energy value in the supplied units.
+                              Use auto to auto scale by the max energy.
+  --e-step=ESTEP              Set the step of grid lines for Energy. With max_e='auto, generate
+                              this automatically.
   --high-res -H               Output a high resolution plot.
   --max-q=MAXQ -q MAXQ        Set the maximum for the charge (pcolormesh's vmax value).
   --min-q=MINQ                Set a minimum charge.
   --normalize -n              Normalize the histogram to MeV^-1 rad^-1 .
   --factor=F -f F             Multiply histogram by F. [default: 1.0]
-  --polar -p                  Plot polar angles, letting the east direction be forward.
+  --polar -p                  Plot polar angles for 3D data, letting the east direction be forward.
   --oap=ANGLE -o ANGLE        Set the width angle of the OAP. [default: 50.47]
   --massE=E                   Set the mass of the particles for efficiency in eV. [default: 0.511e6]
   --log10 -l                  Plot a logarithmic pcolor instead of a linear one.

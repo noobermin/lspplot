@@ -3,8 +3,7 @@
 Show an angular/energy/charge plot.
 
 Usage:
-  angular.py [options] <input>
-  angular.py [options] <input> <output>
+  angular.py [options] <input> [<output>]
 
 Options:
   --angle-bins=BINS -a BINS   Set the number of angle bins.  [default: 180]
@@ -14,10 +13,10 @@ Options:
   --clabel=CLABEL -c CLABEL   Set colorbar label. [default: $p C$]
   --no-cbar                   Turn off the colorbar.
   --keV -k                    Use KeV. Included for backwards compatibility.
-  --energy-units=UNITS        Set the energy units. Options are MeV, KeV, and eV [default: MeV]
+  --energy-units=UNITS        Set the energy units. Options are MeV, KeV, and eV [default: auto]
   --max-e=MAXE -e MAXE        Set the maximum energy value in the supplied units.
-                              Use auto to auto scale by the max energy.
-  --e-step=ESTEP              Set the step of grid lines for Energy. With max_e='auto, generate
+                              Use auto to auto scale by the max energy. [default: auto]
+  --e-step=ESTEP              Set the step of grid lines for Energy. With max_e='auto', generate
                               this automatically.
   --high-res -H               Output a high resolution plot.
   --max-q=MAXQ -q MAXQ        Set the maximum for the charge (pcolormesh's vmax value).
@@ -53,5 +52,5 @@ if opts['<output>']:
     else:
         plt.savefig(opts['<output>']);
 else:
-    plt.show();    
+    plt.show();
 pass;

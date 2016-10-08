@@ -11,51 +11,55 @@ Options:
   --ltitle=TITLE -t TITLE     Set the title.
   --rtitle=TITLE -T TITLE     Set the right title.
   --clabel=CLABEL -c CLABEL   Set colorbar label. [default: $p C$]
-  --timestep=S -s S           Set timestep in ns. [default: 1e-6]
-  --initial-time=T -i T       Set initial timestep in ns. [default: 0]
-  --minus-time=T -m T         Subtract this time. [default: 0]
   --no-cbar                   Turn off the colorbar.
-  --keV -k                    Scale by 100s of KeV instead of MeV.
-  --max-e=MAXE -e MAXE        Set the maximum energy value (in units depending on --keV flag)
-  --e-step=ESTEP              Set the step of grid lines for Energy.
-  --high-res -H               Output a high resolution plt.
+  --keV -k                    Use KeV. Included for backwards compatibility.
+  --energy-units=UNITS        Set the energy units. Options are MeV, KeV, and eV [default: auto]
+  --max-e=MAXE -e MAXE        Set the maximum energy value in the supplied units.
+                              Use auto to auto scale by the max energy. [default: auto]
+  --e-step=ESTEP              Set the step of grid lines for Energy. With max_e='auto', generate
+                              this automatically.
+  --high-res -H               Output a high resolution plot.
   --max-q=MAXQ -q MAXQ        Set the maximum for the charge (pcolormesh's vmax value).
   --min-q=MINQ                Set a minimum charge.
-  --normalize -n              Normalize the histogram to 1 *eV^-1 rad^-1 .
+  --normalize -n              Normalize the histogram to MeV^-1 rad^-1 .
   --factor=F -f F             Multiply histogram by F. [default: 1.0]
-  --polar -p                  Plot polar angles, letting the east direction be forward.
+  --polar -p                  Plot polar angles for 3D data, letting the east direction be forward.
   --oap=ANGLE -o ANGLE        Set the width angle of the OAP. [default: 50.47]
   --massE=E                   Set the mass of the particles for efficiency in eV. [default: 0.511e6]
   --log10 -l                  Plot a logarithmic pcolor instead of a linear one.
-  --cmap=CMAP                 Use the following cmap [default: viridus].
+  --cmap=CMAP                 Use the following cmap [default: viridis].
   --e-direction=ANGLE         The angle for the radial labels.
   --e-units=UNIT              The units for the radial labels.
+  --agg -A                    Use the agg backend.
   --lsp -L                    Search for the lsp file in the current directory.
   --efficiency=E              Calculate the efficiency and display it, pass a tuple
                               of the energy cut.
   --interval=I                Set animate interval. [default: 100]
+  --timestep=S -s S           Set timestep in ns. [default: 1e-6]
+  --initial-time=T -i T       Set initial timestep in ns. [default: 0]
+  --minus-time=T -m T         Subtract this time. [default: 0]
+  --timestamp-pos=POS         Set the timestamp position as a tuple [default: (0.02,0.05)];
+
 '''
 from docopt import docopt;
 import numpy as np;
 import matplotlib.pyplot as plt;
 import matplotlib.animation as anim;
-from  lspplot.angular import _prep,angular
-
+from lspplot.angular import _prep2,angular
+from pys import test,parse_ftuple;
 opts = docopt(__doc__,help=True);
-s,phi,e,kw,d = _prep(opts);
+d,kw = _prep2(opts);
 
 tstep = float(opts['--timestep']);
 ti    = float(opts['--initial-time']);
 mt    = float(opts['--minus-time']);
+tx,ty  = parse_ftuple(opts['--timestamp-pos']);
 
 interval=float(opts['--interval']);
 #process by times.
 good = np.argsort(d['t'])
-s   = s[good];
-e   = e[good];
-phi = phi[good];
-t   = d['t'][good];
-
+d = d[good];
+t = d['t'];
 tbins = np.arange(ti,t[-1]+tstep,tstep);
 #fucking c like loop shit mother fucker.
 i=0;
@@ -65,16 +69,28 @@ for j,ct in enumerate(t):
         Is.append(j);
         i+=1;
 #do first
-#surf,_,fig,bins = angular(s[Is[0]:],phi[Is[0]:],e[Is[0]:],**kw);
-surf,_,fig,bins = angular(s, phi, e,**kw);
-#surf,_,fig,bins = angular([],[],[],**kw);
-t=fig.text(0.02,0.05,'t = {:3.2f}e-4 ns'.format(tbins[0]*1e4),
+surf,ax,fig,bins,data = angular(d,**kw);
+kw['fig'] = fig;
+rmax=ax.get_rmax()
+t=fig.text(tx,ty,'t = {:4.1f} fs'.format(tbins[0]*1e6),
            fontdict={'fontsize':22});
+if not test(kw, 'phi'):
+    kw['phi']='phi'
+
 def animate(ii):
     j,i = ii;
-    S,_,_ = np.histogram2d(phi[:i],e[:i],bins=bins,weights=s[:i]);
+    #plt.clf();
+    #_,ax,_,_ = angular(d[:i],**kw);
+    #ax.set_rmax(rmax);
+    S,_,_ = np.histogram2d(
+        data[0][:i],
+        data[1][:i],
+        bins=bins,
+        weights=data[2][:i]);
     surf.set_array(S[::,:-1].ravel());
-    t.set_text('t = {:3.2f}e-4 ns'.format((tbins[j]-mt)*1e4));
+    #t=fig.text(tx,ty,'t = {:3.2f}e-4 ns'.format((tbins[j]-mt)*1e4),
+    #       fontdict={'fontsize':22});
+    t.set_text('t = {:4.1f} fs'.format((tbins[j]-mt)*1e6));
     return surf;
 
 a=anim.FuncAnimation(fig, animate,

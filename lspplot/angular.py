@@ -62,53 +62,60 @@ def totalKE(d, ecut=0, anglecut=None,return_bools=False):
         return KE;
 
 
-defaults = {
-    'tlabels': ['Forward\n0$^{\circ}$',
-               '45$^{\circ}$',
-               'Up\n90$^{\circ}$',
-               '135$^{\circ}$',
-               'Backwards\n180$^{\circ}$',
-               '215$^{\circ}$',
-               'Down\n270$^{\circ}$',
-               '315$^{\circ}$'],
-    'labels': ['Forward\n0$^{\circ}$',
-               '45$^{\circ}$',
-               'Left\n90$^{\circ}$',
-               '135$^{\circ}$',
-               'Backwards\n180$^{\circ}$',
-               '215$^{\circ}$',
-               'Right\n270$^{\circ}$',
-               '315$^{\circ}$'],
-    'angle_bins': 180,
-    'energy_bins': 40,
-    'max_e': 4.0,
-    'max_e_kev': 1000,
-    'e_step' : 1.0,
-    'e_step_kev': 250,
-    'max_q': None,
-    'min_q': None,
-    'cmap': pastel_clear,
-    'clabel': '$pC$',
-    'log_q' : None,
-    'norm_units': ' rad$^{-1}$ MeV$^{-1}$',
-};
+defaults = dict(
+    tlabels=['Forward\n0$^{\circ}$',
+             '45$^{\circ}$',
+             'Up\n90$^{\circ}$',
+             '135$^{\circ}$',
+             'Backwards\n180$^{\circ}$',
+             '215$^{\circ}$',
+             'Down\n270$^{\circ}$',
+             '315$^{\circ}$'],
+    labels=['Forward\n0$^{\circ}$',
+            '45$^{\circ}$',
+            'Left\n90$^{\circ}$',
+            '135$^{\circ}$',
+            'Backwards\n180$^{\circ}$',
+            '215$^{\circ}$',
+            'Right\n270$^{\circ}$',
+            '315$^{\circ}$'],
+    energy_units='MeV',
+    angle_bins=180,
+    energy_bins=40,
+    min_q = None,
+    max_q = None,
+    cmap  = pastel_clear,
+    clabel= '$pC$',
+    log_q = None,
+    norm_units=' rad$^{-1}$ MeV$^{-1}$',
+);
+unit_defaults = dict(
+    eV=dict(
+        energy_scale=1,
+        toMeV=1e6,
+        max_e=800.0,  e_step=200.0),
+    KeV=dict(
+        energy_scale=1e3,
+        toMeV=1e3,
+        max_e=1000.0,e_step=250.0),
+    MeV=dict(
+        energy_scale=1e6,
+        toMeV=1,
+        max_e=4.0, e_step=1.0),
+    GeV=dict(
+        energy_scale=1e9,
+        toMeV=1e-3,
+        max_e=2.0, e_step=0.5),);
+
+
 
 rgrid_defaults = dict(
-    unit='MeV',
-    unit_kw='keV',
     angle=45,
     size=10.5,
     color='gray');
 
-def getkw(kw,label):
-    return kw[label] if test(kw,label) else defaults[label];
-def getkw_kev(kw,label,kev):
-    if test(kw,label):
-        return kw[label];
-    if kev: label+='_kev';
-    return defaults[label];
 def angular(d, phi=None, e=None,
-            colorbar=True,**kw):
+            **kw):
     '''
     Make the angular plot.
     Call form 1:
@@ -127,41 +134,63 @@ def angular(d, phi=None, e=None,
       d   -- pext data, a structured array from the lspreader.
 
     Keyword Arugments:
-      phi         -- If a string, read this array of recs as
-                     the angles. If an array, these are the angles.
-      e           -- If not None, use these as energies over d['KE']
-      F           -- Multiply charges by a factor.
-      max_e       -- Maximum energy, if 'auto',
-                     bin automatically.
-      max_q       -- Maximum charge.
-      angle_bins  -- Set the number of angle bins.
-      energy_bins -- Set the number of energy bins.
-      clabel      -- Set the colorbar label.
-      colorbar    -- If true, plot the colorbar.
-      e_step      -- Set the steps of the radius contours.
-      labels      -- Set the angular labels. If not a list, if
-                     'default', use default. If 'tdefault', use
-                     default for theta. (See defaults dict);
-      keV         -- Use keV instead of MeV.
-      fig         -- If set, use this figure, Otherwise,
-                     make a new figure.
-      ax          -- If set, use this axis. Otherwise,
-                     make a new axis.
-      ltitle      -- Make a plot on the top left.
-      rtitle      -- Make a plot on the top right.
-      log_q       -- log10 the charges.
-      cmap        -- use the colormap cmap.
-      rgridopts   -- pass a dictionary that sets details for the
-                     rgrid labels.
-      oap         -- Plot this half angle if not None.
-      normalize   -- Subdivide charges by the bin weights.
-      efficiency  -- calculate and display the conversion efficiency in
-                     the oap angle. A dict of options passed to totalKE
-                     and laserE (I only, not E_0). See help for totalKE
-                     and laserE.
+      phi          -- If a string, read this array of recs as
+                      the angles. If an array, these are the angles.
+      e            -- If not None, use these as energies over d['KE']
+
+      energy_units -- Set the energy units. Options are eV, KeV, MeV, GeV,
+                      and auto. auto chooses the unit based on the max
+                      energy.
+      energy_scale -- Set the energy scale. Not required, but you can hack it
+                      from the default due to energy_unit if you wish.
+      toMeV        -- Scale to the MeV scale from energy scale. Not required,
+                      but you can hack it from energy_unit if you wish.
+      max_e        -- Maximum energy, if 'auto',
+                      bin automatically.
+      e_step       -- Set the steps of the radius contours.
+
+      min_q        -- Minimum charge.
+      max_q        -- Maximum charge.
+
+      angle_bins   -- Set the number of angle bins.
+      energy_bins  -- Set the number of energy bins.
+
+      colorbar     -- If true, plot the colorbar.
+      cmap         -- use the colormap cmap.
+      clabel       -- Set the colorbar label.
+
+      labels       -- Set the angular labels. If not a list, if
+                      'default', use default. If 'tdefault', use
+                      default for theta. (See defaults dict);
+
+      normalize    -- Subdivide charges by the bin weights.
+
+      fig          -- If set, use this figure, Otherwise,
+                      make a new figure.
+      ax           -- If set, use this axis. Otherwise,
+                      make a new axis.
+      ltitle       -- Make a plot on the top left.
+      rtitle       -- Make a plot on the top right.
+      log_q        -- log10 the charges.
+      rgridopts    -- pass a dictionary that sets details for the
+                      rgrid labels. Options for this dict are:
+            angle     -- angle of labels.
+            size      -- text side.
+            color     -- grid color.
+            invert    -- invert the rgrid colors.
+
+      oap          -- Plot this apex angle if not None as the oap 
+                      collection angle.
+
+      efficiency   -- calculate and display the conversion efficiency in
+                      the oap angle. A dict of options passed to totalKE
+                      and laserE (I only, not E_0). See help for totalKE
+                      and laserE.
+      F            -- Multiply charges by a factor.
+
     '''
     #reckon the call form
-    kev = test(kw, 'keV');
+    getkw = mk_getkw(kw,defaults);
     if type(d) == np.ndarray and len(d.dtype) > 0:
         structd = True;
         e = np.copy(d['KE']);
@@ -171,17 +200,27 @@ def angular(d, phi=None, e=None,
     else:
         structd = False;
         if phi is None or e is None:
-            raise ValueError("Either d isn't a recarray or phi and s were not passed.")
+            raise ValueError(
+                "Either phi and s were not passed. See help.");
         s = d;
-    if kev:
-        e/=1e3;
-    else:
-        e/=1e6;
+    eunits = getkw('energy_units');
+    if eunits == 'auto':
+        pw = np.log10(np.max(e))
+        if pw < 3:
+            eunits = 'eV';
+        elif pw <= 5:
+            eunits = 'KeV';
+        elif pw <= 9:
+            eunits = 'MeV';
+        else:
+            eunits = 'GeV';
+    getunitkw = mk_getkw(kw,unit_defaults[eunits]);
     if test(kw, 'F'): s*=kw['F'];
-    phi_spacing = getkw(kw,'angle_bins');
-    E_spacing =   getkw(kw,'energy_bins');
-    maxE  = getkw_kev(kw,'max_e',kev);
-    Estep = getkw_kev(kw,'e_step',kev);
+    phi_spacing = getkw('angle_bins');
+    E_spacing =   getkw('energy_bins');
+    e /= getunitkw('energy_scale');
+    maxE  = getunitkw('max_e');
+    Estep = getunitkw('e_step');
     if maxE == 'max':
         maxE = np.max(e);
     elif maxE == 'round' or maxE == 'auto':
@@ -190,33 +229,36 @@ def angular(d, phi=None, e=None,
         mantissa = np.floor(mxe/(10**tenpow));
         maxE = 10**tenpow * (int(mxe/(10**tenpow))+1)
         Estep = 10**tenpow;
-        if mantissa > 5:
-            Estep = 5*10**tenpow;
-    print(maxE,Estep);
-    maxQ  = getkw(kw,'max_q');
-    minQ  = getkw(kw,'min_q');
+        if mantissa > 6:
+            Estep = 6*10**tenpow;
+    maxQ  = getkw('max_q');
+    minQ  = getkw('min_q');
     if test(kw,"normalize"):
         s /= maxE/E_spacing*2*np.pi/phi_spacing;
-    clabel = getkw(kw,'clabel');
-    cmap = getkw(kw, 'cmap');
+        s *= getunitkw('toMeV');
+    clabel = getkw('clabel');
+    cmap = getkw('cmap');
     phi_bins = np.linspace(-np.pi,np.pi,phi_spacing+1);
     E_bins   = np.linspace(0, maxE, E_spacing+1);
             
     PHI,E = np.mgrid[ -np.pi : np.pi : phi_spacing*1j,
-                      0 : maxE : E_spacing*1j];
+                           0 :  maxE :   E_spacing*1j];
+    
     S,_,_ = np.histogram2d(phi,e,bins=(phi_bins,E_bins),weights=s);
     if test(kw,'fig'):
         fig = kw['fig']
     else:
         fig = plt.figure(1,facecolor=(1,1,1));
     if test(kw,'ax'):
-        ax= kw['ax']
+        ax = kw['ax']
     else:
-        ax= plt.subplot(projection='polar',axisbg='white');
+        ax = plt.subplot(projection='polar',axisbg='white');
     norm = matplotlib.colors.LogNorm() if test(kw,'log_q') else None;
-    
-    surf=plt.pcolormesh(PHI,E,S,norm=norm, cmap=cmap,vmin=minQ,vmax=maxQ);
-    if colorbar:
+    ax.set_rmax(maxE);
+    surf=plt.pcolormesh(
+        PHI,E,S,norm=norm,cmap=cmap,
+        vmin=minQ,vmax=maxQ);
+    if test(kw,'colorbar'):
         c=fig.colorbar(surf,pad=0.1);
         c.set_label(clabel);
     #making radial guides. rgrids only works for plt.polar calls
@@ -225,12 +267,11 @@ def angular(d, phi=None, e=None,
         ropts = kw['rgridopts'];
     else:
         ropts = dict();
-        
     getrkw = mk_getkw(ropts,rgrid_defaults);
     if test(ropts, 'unit'):
         runit = ropts['unit'];
     else:
-        runit = 'keV' if kev else 'MeV';
+        runit = eunits;
     rangle=getrkw('angle');
     rsize =getrkw('size');
     gridc =getrkw('color');
@@ -239,7 +280,8 @@ def angular(d, phi=None, e=None,
     else:
         c1,c2 = "black","w";
     full_phi = np.linspace(0.0,2*np.pi,100);
-    for i in np.arange(0.0,maxE,Estep)[1:]:
+    rlabels  = np.arange(0.0,maxE,Estep)[1:];
+    for i in rlabels:
         plt.plot(full_phi,np.ones(full_phi.shape)*i,
                  c=gridc, alpha=0.9,
                  lw=1, ls='--');
@@ -247,7 +289,6 @@ def angular(d, phi=None, e=None,
     ax.patch.set_alpha(0.0);
     ax.set_axis_bgcolor('red');
     rlabel_str = '{} ' + runit;
-    rlabels    = np.arange(0.0,maxE,Estep)[1:];
     #text outlines.
     _,ts=plt.rgrids(rlabels,
                     labels=map(rlabel_str.format,rlabels),
@@ -269,8 +310,10 @@ def angular(d, phi=None, e=None,
                 ecut=0, anglecut=None);
             effd=sd(defeff,**kw['efficiency']);
             if effd['ecut'] == 'wilks':
-                effd['ecut'] = (np.sqrt(1+a0(effd['I'],l=effd['l']*1e2)**2/2.0) - 1.0)*effd['massE'];
-            minr = effd['ecut'] * (1e-3 if kev else 1e-6);
+                effd['ecut'] = (
+                    np.sqrt(1+a0(effd['I'],l=effd['l']*1e2)**2/2.0) - 1.0
+                )*effd['massE'];
+            minr = effd['ecut'] / getunitkw('energy_scale');
             dim = effd['dim'];
             LE=laserE(I=effd['I'],w=effd['w'],T=effd['T'],dim=dim);
             KE,good=totalKE(
@@ -297,7 +340,7 @@ def angular(d, phi=None, e=None,
                     texs(effd['I'],l=1)),
                 fontdict=dict(fontsize=20));
         else:
-            minr = 120 if kev else 0.12;
+            minr = 0.12/getunitkw('toMeV')
         ths=np.linspace(mint, maxt, 20);
         rs =np.linspace(minr, maxr, 20);
         mkline = lambda a,b: plt.plot(a,b,c=(0.2,0.2,0.2),ls='-',alpha=0.5);
@@ -323,7 +366,7 @@ def angular(d, phi=None, e=None,
             fig.text(0.60,0.875,kw['rtitle'],fontdict={'fontsize':22});
         else:
             plt.title(kw['rtitle'],loc='right',fontdict={'fontsize':22});
-    return (surf, ax, fig, (phi_bins, E_bins));
+    return (surf, ax, fig, (phi_bins, E_bins), (phi,e,s));
 
 
 
@@ -357,8 +400,7 @@ def _prep(opts):
     kw=_prepkw(opts);
     #this deals with pre-processing.
     s,phi,e,d = angular_load(
-        opts['<input>'],
-        polar=opts['--polar'])
+        opts['<input>'], polar=opts['--polar'])
     return s,phi,e,kw,d;
 def _prep2(opts):
     kw=_prepkw(opts);
@@ -368,9 +410,10 @@ def _prep2(opts):
 def _prepkw(opts):
     '''Prep from options'''
     inname = opts['<input>'];
-    kev = opts['--keV'];
+    eunit  = opts['--energy-units'];
+    if opts['--keV']:
+        eunit='KeV';
     def getdef_kev(label):
-        
         if kev:
             return defaults[label+'_kev'];
         else:
@@ -380,7 +423,6 @@ def _prepkw(opts):
         'energy_bins': float(opts['--energy-bins']),
         'max_q': float(opts['--max-q']) if opts['--max-q'] else None,
         'min_q': float(opts['--min-q']) if opts['--min-q'] else None,
-        'keV': kev,
         'clabel' : opts['--clabel'],
         'colorbar' : not opts['--no-cbar'],
         'e_step' : float(opts['--e-step']) if opts['--e-step'] else None,
@@ -391,6 +433,7 @@ def _prepkw(opts):
         'log_q': opts['--log10'],
         'normalize':opts['--normalize'],
         'F':float(opts['--factor']),
+        'energy_units':eunit,
     };
     if opts['--max-e']:
         try:
@@ -416,13 +459,11 @@ def _prepkw(opts):
         ecut = opts['--efficiency']
         if ecut != 'wilks':
             ecut = float(opts['--efficiency']);
-            if kev:
-                ecut*=1e3;
-            else:
-                ecut*=1e6;
         kw['efficiency'] = dict(
             I=I,w=w,T=T,l=l,dim=dim,
             ecut=ecut, massE=massE);
+    if opts['--polar']:
+        kw['phi']='phi_n';
     return kw;
 
 def _str2cmap(i):    

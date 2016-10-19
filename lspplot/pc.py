@@ -78,7 +78,7 @@ def pc(q,p=None,**kw):
                 linthresh=getkw('linthresh'),
                 linscale=getkw('linscale'),
                 vmin=mn,vmax=mx);
-        elif:
+        else:
             norm= LogNorm();
             q  += 1;
     else:

@@ -313,12 +313,12 @@ def angular(d, phi=None, e=None,
                 effd['ecut'] = (
                     np.sqrt(1+a0(effd['I'],l=effd['l']*1e2)**2/2.0) - 1.0
                 )*effd['massE'];
-            minr = effd['ecut'] / getunitkw('energy_scale');
             dim = effd['dim'];
             LE=laserE(I=effd['I'],w=effd['w'],T=effd['T'],dim=dim);
             KE,good=totalKE(
                 d, ecut=effd['ecut'], anglecut=(oap/np.pi*180,dim),
                 return_bools=True)
+            minr = effd['ecut'] / getunitkw('energy_scale');
             totalq = np.abs(d['q'][good]).sum()*1e6;
             def texs(f,l=2):
                 tenpow=int(np.floor(np.log10(f)));

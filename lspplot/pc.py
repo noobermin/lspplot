@@ -11,12 +11,14 @@ import numpy.linalg as lin;
 from pys import parse_ftuple,test,takef,mk_getkw;
 from consts import *
 
-pc_defaults = {
-    'xlabel':'microns',
-    'ylabel':'microns',
-    'title':'',
-    'clabel':'',
-};
+pc_defaults = dict(
+    xlabel='microns',
+    ylabel='microns',
+    title='',
+    clabel='',
+    linthresh=1.0,
+    linscale=1.0,
+)
 
 
 def pc(q,p=None,**kw):
@@ -30,14 +32,19 @@ def pc(q,p=None,**kw):
              direction and y is the "transverse" direction.
              Thus, they are flipped of that of the *cartesian*
              axes of the array. Can be shaped as q as in pcolormesh.
-             For 1D arrays, we meshgrid them.
+             For 1D arrays, we meshgrid them. Otherwise, we just pass
+             them to pcolormesh.
 
     Keywords Arguments:
-      axes   -- use these Axes from matplotlib
-      agg    -- use agg
-      lims   -- set vlims. If not set, vlims are not
-                set for pcolormesh
-      log    -- use log norm
+      axes      -- use these Axes from matplotlib
+      agg       -- use agg
+      lims      -- set vlims as a 2-tuple. If not set, or a lim is None,
+                   vlims are not set for pcolormesh
+      log       -- use log norm. If vmin is negative, use SymLogNorm.
+      linthresh -- use this as a value for the linear threshold for
+                   SymLogNorm. See the manual for SymLogNorm.
+      linscale  -- use this as a value for the linear scale for
+                   SymLogNorm. See the manual for SymLogNorm.
       xlabel -- set xlabel
       ylabel -- set ylabel
       title  -- set title
@@ -45,7 +52,7 @@ def pc(q,p=None,**kw):
 
     Returns:
       A dictionary with axes, pcolormesh object,
-      amongst other things. pass this dict to `highlight`
+      amongst other things. Pass this dict to `highlight`
       and `trajectories` to plot on the same figure.
     '''
     def getkw(l):
@@ -61,15 +68,21 @@ def pc(q,p=None,**kw):
         kw['axes'] = plt.axes();
     ret={};
     ax = ret['axes'] = kw['axes'];
-    if test(kw,'log'):
-        norm= LogNorm();
-        q  += 1;
-    else:
-        norm= None;
     if test(kw, 'lims'):
         mn, mx = kw['lims'];
     else:
         mn, mx = None, None
+    if test(kw,'log'):
+        if mn<0 or test(kw,"force_symlog"):
+            norm = SymLogNorm(
+                linthresh=getkw('linthresh'),
+                linscale=getkw('linscale'),
+                vmin=mn,vmax=mx);
+        elif:
+            norm= LogNorm();
+            q  += 1;
+    else:
+        norm= None;
     if p == None:
         p = np.arange(q.shape[0]), np.arange(q.shape[1]);
     x,y=p;

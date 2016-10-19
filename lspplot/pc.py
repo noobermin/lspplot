@@ -59,7 +59,7 @@ def pc(q,p=None,**kw):
         if test(kw,l):
             return kw[l];
         return pc_defaults[l];
-    from matplotlib.colors import LogNorm;
+    from matplotlib.colors import LogNorm,SymLogNorm;
     import matplotlib;
     if test(kw,"agg"):
         matplotlib.use("agg");

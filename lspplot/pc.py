@@ -97,7 +97,7 @@ def pc(q,p=None,**kw):
 
     if type(norm) is SymLogNorm:
         mnl = int(np.floor(np.log10(-mn)));
-        mxl = int(np.floot(np.log10( mx)));
+        mxl = int(np.floor(np.log10( mx)));
         ticks=( [vmin]
                   + [ -10.0**x for x in range(mnl,-linthresh-1,-1)]
                   + [  0.0 ]

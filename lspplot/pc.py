@@ -94,21 +94,22 @@ def pc(q,p=None,**kw):
     ret['x'],ret['y'] = x,y;
     mypc = ret['pc'] =ax.pcolormesh(
         y,x,q,vmin=mn,vmax=mx,cmap=getkw('cmap'),norm=norm);
-
+    ret['cbar'] = cbar = plt.colorbar(mypc);
     if type(norm) is SymLogNorm:
         mnl = int(np.floor(np.log10(-mn)));
         mxl = int(np.floor(np.log10( mx)));
         thrl= int(np.floor(np.log10(np.abs(linthresh))));
-        ticks=( [  -10.0**x for x in np.arange(mnl,-thrl-1,-1)]
-                + [  0.0 ]
-                + [ 10.0**x for x in np.arange(-thrl, mxl+1)] )
-        cbar = plt.colorbar(mypc,ticks=ticks);
-    else:
-        cbar = plt.colorbar(mypc);
-    ret['cbar']=cbar;
-    if "clabel" in kw and kw["clabel"] is False:
-        pass;
-    else:
+        negpows = np.arange(thrl,mnl+1)[::-1];
+        pospows = np.arange(thrl,mxl+1);
+        ticks   = np.concatenate( (
+            -10**negpows, [0.0], 10**pospows));
+        tlabels = (
+            [ "-10$^{{{}}}$".format(int(p)) for p in negpows]
+            + ['0']
+            + [" 10$^{{{}}}$".format(int(p)) for p in pospows]);
+        cbar.set_ticks(ticks);
+        cbar.set_ticklabels(tlabels);
+    if test(kw,"clabel"):
         cbar.set_label(getkw("clabel"));
     ax.set_xlabel(getkw("xlabel"));
     ax.set_ylabel(getkw("ylabel"));

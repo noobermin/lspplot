@@ -102,7 +102,7 @@ def pc(q,p=None,**kw):
         negpows = np.arange(thrl,mnl+1)[::-1];
         pospows = np.arange(thrl,mxl+1);
         ticks   = np.concatenate( (
-            -10**negpows, [0.0], 10**pospows));
+            -10.0**negpows, [0.0], 10.0**pospows));
         tlabels = (
             [ "-10$^{{{}}}$".format(int(p)) for p in negpows]
             + ['0']

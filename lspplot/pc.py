@@ -75,8 +75,9 @@ def pc(q,p=None,**kw):
         mn, mx = None, None
     if test(kw,'log'):
         if mn<0 or test(kw,"force_symlog"):
+            linthresh = getkw('linthresh');
             norm = SymLogNorm(
-                linthresh=getkw('linthresh'),
+                linthresh=linthresh,
                 linscale=getkw('linscale'),
                 vmin=mn,vmax=mx);
         else:
@@ -93,7 +94,19 @@ def pc(q,p=None,**kw):
     ret['x'],ret['y'] = x,y;
     mypc = ret['pc'] =ax.pcolormesh(
         y,x,q,vmin=mn,vmax=mx,cmap=getkw('cmap'),norm=norm);
-    cbar = ret['cbar'] = plt.colorbar(mypc);
+
+    if type(norm) is SymLogNorm:
+        mnl = int(np.floor(np.log10(mn)));
+        mxl = int(np.floot(np.log10(mx)));
+        ticks=( [vmin]
+                  + [ -10.0**x for x in range(mnl,-linthresh-1,-1)]
+                  + [  0.0 ]
+                  + [  10.0**x for x in range(-linthresh,mxl+1)    ]
+                  + [vmax] )
+        cbar = plt.colorbar(mypc,ticks=ticks);
+    else:
+        cbar = plt.colorbar(mypc);
+    ret['cbar']=cbar;
     if "clabel" in kw and kw["clabel"] is False:
         pass;
     else:

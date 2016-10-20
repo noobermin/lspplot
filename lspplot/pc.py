@@ -96,8 +96,8 @@ def pc(q,p=None,**kw):
         y,x,q,vmin=mn,vmax=mx,cmap=getkw('cmap'),norm=norm);
 
     if type(norm) is SymLogNorm:
-        mnl = int(np.floor(np.log10(mn)));
-        mxl = int(np.floot(np.log10(mx)));
+        mnl = int(np.floor(np.log10(-mn)));
+        mxl = int(np.floot(np.log10( mx)));
         ticks=( [vmin]
                   + [ -10.0**x for x in range(mnl,-linthresh-1,-1)]
                   + [  0.0 ]

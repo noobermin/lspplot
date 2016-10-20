@@ -16,6 +16,7 @@ pc_defaults = dict(
     ylabel='microns',
     title='',
     clabel='',
+    cmap='viridis',
     linthresh=1.0,
     linscale=1.0,
 )
@@ -91,7 +92,7 @@ def pc(q,p=None,**kw):
     ret['q'] = q;
     ret['x'],ret['y'] = x,y;
     mypc = ret['pc'] =ax.pcolormesh(
-        y,x,q,vmin=mn,vmax=mx,cmap='viridis',norm=norm);
+        y,x,q,vmin=mn,vmax=mx,cmap=getkw('colormap'),norm=norm);
     cbar = ret['cbar'] = plt.colorbar(mypc);
     if "clabel" in kw and kw["clabel"] is False:
         pass;

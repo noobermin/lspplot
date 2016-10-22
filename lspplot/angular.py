@@ -151,6 +151,8 @@ def angular(d, phi=None, e=None,
 
       min_q        -- Minimum charge.
       max_q        -- Maximum charge.
+      angle_range  -- Only bin and plot these angles. Does not affect angle
+                      binning, bins are still over (-pi,pi)
 
       angle_bins   -- Set the number of angle bins.
       energy_bins  -- Set the number of energy bins.
@@ -214,6 +216,13 @@ def angular(d, phi=None, e=None,
             eunits = 'MeV';
         else:
             eunits = 'GeV';
+    if test(kw,'angle_range'):
+        mnang,mxang = kw['angle_range'];
+        good = np.logical_and(phi >= mnang, phi <= mxang);
+        phi = phi[good];
+        e   =   e[good];
+        if structd:
+            d = d[good];
     getunitkw = mk_getkw(kw,unit_defaults[eunits]);
     if test(kw, 'F'): s*=kw['F'];
     phi_spacing = getkw('angle_bins');

@@ -218,9 +218,14 @@ def angular(d, phi=None, e=None,
             eunits = 'GeV';
     if test(kw,'angle_range'):
         mnang,mxang = kw['angle_range'];
-        good = np.logical_and(phi >= mnang, phi <= mxang);
+        if mxang > np.pi:
+            good = np.logical_and(phi >= mnang, phi <= np.pi);
+            good|= np.logical_and(phi >= -np.pi, phi <= -(mxang-np.pi));
+        else:
+            good = np.logical_and(phi >= mnang, phi <=  mxang);
         phi = phi[good];
         e   =   e[good];
+        s   =   s[good];
         if structd:
             d = d[good];
     getunitkw = mk_getkw(kw,unit_defaults[eunits]);
@@ -445,7 +450,8 @@ def _prepkw(opts):
         'energy_units':eunit,
     };
     if opts['--angle-range']:
-        kw['angle_range'] = parse_ftuple(opts['--angle-range']);
+        kw['angle_range'] = [
+            x*np.pi for x in parse_ftuple(opts['--angle-range'])];
     if opts['--max-e']:
         try:
             kw['max_e']=float(opts['--max-e']);

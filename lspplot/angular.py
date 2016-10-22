@@ -444,6 +444,8 @@ def _prepkw(opts):
         'F':float(opts['--factor']),
         'energy_units':eunit,
     };
+    if opts['--angle-range']:
+        kw['angle_range'] = parse_ftuple(opts['--angle-range']);
     if opts['--max-e']:
         try:
             kw['max_e']=float(opts['--max-e']);

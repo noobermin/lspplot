@@ -18,6 +18,8 @@ Options:
                               Use auto to auto scale by the max energy. [default: auto]
   --e-step=ESTEP              Set the step of grid lines for Energy. With max_e='auto', generate
                               this automatically.
+  --angle-range=A -R A        Only plot this range of angles, does not change binning which is still
+                              -pi to pi. Pass the values as fractions of pi. Example, -A (-0.5,0).
   --high-res -H               Output a high resolution plot.
   --max-q=MAXQ -q MAXQ        Set the maximum for the charge (pcolormesh's vmax value).
   --min-q=MINQ                Set a minimum charge.

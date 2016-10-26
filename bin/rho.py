@@ -67,7 +67,7 @@ rho = reduce(
     np.add,
     np.gradient(
         [Ex,Ey],
-        varargs=[x[:,0], y[0,:]])
+        varargs=[x, y])
 ) / e0 / e;
 
 #####################################

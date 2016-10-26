@@ -17,7 +17,7 @@ Options:
     --quantity=Q -Q Q   Use this quantity for n_c lineout. [default: RhoN10]
     --dir=D -D D        Read from this dir [default: .]
     --restrict=R        Restrict it.
-    --title=T           Set the title [default: Electron density]
+    --title=T           Set the title [default: Charge Density]
     --units=U           Set the colorbar units [default: e/cc ]
     --laser             Plot contours of the laser poyting vector.
     --intensity=I -I I  Make a contour of this intensity [default: 3e18]

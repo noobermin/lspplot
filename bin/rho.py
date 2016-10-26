@@ -65,7 +65,8 @@ if np.isclose(y.max(),y.min()):
 q = d[quantity];
 dx = (x[1,0]-x[0,0])*1e-6;
 dy = (y[0,1]-y[0,0])*1e-6;
-rho = ( np.gradient(Ex,dx,axis=0) + np.gradient(Ey,dy,axis=1) ) / e0 / e * 1e-4;
+
+rho = ( np.gradient(Ex,dx,axis=0) + np.gradient(Ey,dy,axis=1) ) * e0 / e * 1e-4;
 
 #####################################
 #plotting

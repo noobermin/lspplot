@@ -22,6 +22,7 @@ Options:
                         up and down. That is, (1,0) averages by x +1 and -1. [default: (0,0)]
     --dir=D -D D        Read from this dir [default: .]
     --restrict=R        Restrict it.
+    --x-restrict=R      Restrict by positions as a 4 tuple.
     --title=T           Set the title [default: Ion Charge Density]
     --units=U           Set the colorbar units [default: e/cc]
     --laser             Plot contours of the laser poyting vector.
@@ -58,15 +59,23 @@ d = read_indexed(int(opts['<i>']),
     flds=fvar,sclr=qs,
     gzip=gzip,dir=opts['--dir'],
               gettime=True,vector_norms=False);
-if opts['--restrict']:
+#choosing positions
+ylabel =  'z' if np.isclose(d['y'].max(),d['y'].min()) else 'y';
+if opts['--x-restrict']:
+    res = parse_ftuple(opts['--x-restrict'], length=4);
+    res[:2] = [ np.abs(d['x'][:,0]*1e4 - ires).argmin() for ires in res[:2] ];
+    res[2:] = [ np.abs(d[ylabel][0,:]*1e4 - ires).argmin() for ires in res[2:] ];
+    #including the edges
+    res[1]+=1;
+    res[3]+=1;
+    restrict(d,res);
+elif opts['--restrict']:
     res = parse_ituple(opts['--restrict'],length=None);
     restrict(d,res);
+x,y = d['x']*1e4, d[ylabel]*1e4;
 avg = parse_ituple(opts['--average'],length=2);
 #massaging data
 t  = d['t'];
-x,y = d['x']*1e4,d['y']*1e4
-if np.isclose(y.max(),y.min()):
-    y = d['z']*1e4
 q = np.sum([d[Q]*i for Q,i in zip(qs,charges)],axis=0);
 #averaging
 acc = [q];

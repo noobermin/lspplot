@@ -47,7 +47,7 @@ d = read_indexed(int(opts['<i>']),
     gzip=gzip,dir=opts['--dir'],
               gettime=True,vector_norms=False);
 #choosing positions
-ylabel =  'z' if np.isclose(y.max(),y.min()) else 'y';
+ylabel =  'z' if np.isclose(d['y'].max(),d['y'].min()) else 'y';
 
 if opts['--x-restrict']:
     res = parse_ftuple(opts['--x-restrict'], length=4);

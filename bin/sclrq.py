@@ -57,8 +57,8 @@ if opts['--x-restrict']:
 elif opts['--restrict']:
     res = parse_ituple(opts['--restrict'],length=None);
     restrict(d,res);
-#lazily resetting. do this better later...
-x,y = d['x']*1e4,d[ylabel]*1e4;
+
+x,y = d['x']*1e4, d[ylabel]*1e4;
 #massaging data
 t  = d['t'];
 q = d[quantity];

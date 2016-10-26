@@ -54,7 +54,7 @@ if np.isclose(y.max(),y.min()):
 if opts['--x-restrict']:
     res = parse_ftuple(opts['--x-restrict'], length=4);
     res[:2] = [ np.abs(x[:,0] - ires).argmin() for ires in res[:2] ];
-    res[2:] = [ np.abs(y[:,0] - ires).argmin() for ires in res[2:] ];
+    res[2:] = [ np.abs(y[0,:] - ires).argmin() for ires in res[2:] ];
     restrict(d,res);
 elif opts['--restrict']:
     res = parse_ituple(opts['--restrict'],length=None);

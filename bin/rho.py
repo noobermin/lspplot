@@ -18,9 +18,13 @@ Options:
     --dir=D -D D        Read from this dir [default: .]
     --restrict=R        Restrict it.
     --title=T           Set the title [default: Electron density]
-    --units=U           Set the colorbar units [default: coloumb/$m^2$ ]
+    --units=U           Set the colorbar units [default: e/cc ]
     --laser             Plot contours of the laser poyting vector.
     --intensity=I -I I  Make a contour of this intensity [default: 3e18]
+    --linthresh=L       Set the linear threshold for SymLogPlot [default: 1.0]
+    --linscale=L        Set the linear threshold for SymLogPlot [default: 1.0]
+    --cmap=CMAP         Set the colormap. [default: viridis]
+
 '''
 from docopt import docopt;
 import numpy as np;
@@ -30,7 +34,7 @@ from lspreader.flds import read_indexed, restrict
 from lspplot.sclr import S;
 from lspplot.pc import pc,highlight;
 from lspplot.consts import c,mu0,e0;
-
+e=1.602176208e-19
 opts = docopt(__doc__,help=True);
 gzip = not opts['--nozip'];
 quantity = opts['--quantity'];
@@ -60,7 +64,7 @@ rho = reduce(
     np.gradient(
         E,
         varargs=[x[:,0], y[0,:]])
-) * 1e5 / e0;
+) * 1e5 / e0 / e;
 
 #####################################
 #plotting

@@ -39,7 +39,9 @@ opts = docopt(__doc__,help=True);
 gzip = not opts['--nozip'];
 quantity = opts['--quantity'];
 
-fvar=['E','B'] if opts['--laser'] else None;
+fvar=['E']
+if opts['--laser']:
+    fvar+=['B'];
 titlestr=opts['--title']
 units=opts['--units'];
 svar=[quantity];
@@ -56,15 +58,17 @@ if opts['--restrict']:
 #massaging data
 t  = d['t'];
 x,y = d['x']*1e4,d['y']*1e4
+Ex,Ey = d['Ex']*1e5, d['Ey']*1e5;
 if np.isclose(y.max(),y.min()):
     y = d['z']*1e4
+    Ey = d['Ez']*1e5;
 q = d[quantity];
 rho = reduce(
     np.add,
     np.gradient(
-        d['E'],
+        [Ey,Ez],
         varargs=[x[:,0], y[0,:]])
-) * 1e5 / e0 / e;
+) / e0 / e;
 
 #####################################
 #plotting

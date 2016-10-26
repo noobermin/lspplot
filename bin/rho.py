@@ -82,11 +82,11 @@ r=pc(
     clabel=units, title=title,
     agg=not opts['--show']);
 
-if opts['--highlight']:
-    myhi  = float(opts['--highlight']);
-    highlight(
-        r, myhi,
-        color="lightyellow", alpha=0.5);
+#if opts['--highlight']:
+#    myhi  = float(opts['--highlight']);
+#    highlight(
+#        r, myhi,
+#        color="lightyellow", alpha=0.5);
 
 if opts['--laser']:
     laser = S(d);

@@ -64,7 +64,7 @@ if np.isclose(y.max(),y.min()):
     Ey = d['Ez']*1e5;
 q = d[quantity];
 spacing = x[1,:]  - x[0,:];
-rho = ( np.gradient(Ex,x,axis=0) + np.gradient(Ey,y,axis=1) ) / e0 / e;
+rho = ( np.gradient(Ex,x[:,0],axis=0) + np.gradient(Ey,y[0,:],axis=1) ) / e0 / e;
 
 #####################################
 #plotting

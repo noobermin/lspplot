@@ -66,7 +66,7 @@ q = d[quantity];
 rho = reduce(
     np.add,
     np.gradient(
-        [Ey,Ez],
+        [Ex,Ey],
         varargs=[x[:,0], y[0,:]])
 ) / e0 / e;
 

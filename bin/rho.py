@@ -63,11 +63,12 @@ if np.isclose(y.max(),y.min()):
     y = d['z']*1e4
     Ey = d['Ez']*1e5;
 q = d[quantity];
+spacing = x[1,:]  - x[0,:];
 rho = reduce(
     np.add,
     np.gradient(
         [Ex,Ey],
-        varargs=[x, y])
+        varargs=spacing)
 ) / e0 / e;
 
 #####################################

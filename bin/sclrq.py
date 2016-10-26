@@ -51,8 +51,8 @@ ylabel =  'z' if np.isclose(d['y'].max(),d['y'].min()) else 'y';
 
 if opts['--x-restrict']:
     res = parse_ftuple(opts['--x-restrict'], length=4);
-    res[:2] = [ np.abs(x[:,0]*1e4 - ires).argmin() for ires in res[:2] ];
-    res[2:] = [ np.abs(y[0,:]*1e4 - ires).argmin() for ires in res[2:] ];
+    res[:2] = [ np.abs(d['x'][:,0]*1e4 - ires).argmin() for ires in res[:2] ];
+    res[2:] = [ np.abs(d[ylabel][0,:]*1e4 - ires).argmin() for ires in res[2:] ];
     restrict(d,res);
 elif opts['--restrict']:
     res = parse_ituple(opts['--restrict'],length=None);

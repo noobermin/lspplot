@@ -67,8 +67,7 @@ spacing = x[1,:]  - x[0,:];
 rho = reduce(
     np.add,
     np.gradient(
-        [Ex,Ey],
-        varargs=spacing)
+        [Ex,Ey],x,y)
 ) / e0 / e;
 
 #####################################

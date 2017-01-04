@@ -22,6 +22,7 @@ Options:
     --units=U           Set the colorbar units [default: number/cc]
     --laser             Plot contours of the laser poyting vector.
     --intensity=I -I I  Make a contour of this intensity [default: 3e18]
+    --equal -E          Make spatial dimensions equal.
 '''
 from docopt import docopt;
 import numpy as np;
@@ -93,6 +94,9 @@ if opts['--laser']:
               color="red", alpha=0.15);
     
 import matplotlib.pyplot as plt;
+if opts['--equal']:
+    plt.axis('equal');
+    r['axes'].autoscale(tight=True);
 if opts['--show']:
     plt.show();
 else:

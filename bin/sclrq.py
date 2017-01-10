@@ -23,6 +23,7 @@ Options:
     --laser             Plot contours of the laser poyting vector.
     --intensity=I -I I  Make a contour of this intensity [default: 3e18]
     --equal -E          Make spatial dimensions equal.
+    --no-ticks          Don't include ticks.
 '''
 from docopt import docopt;
 import numpy as np;
@@ -97,6 +98,15 @@ import matplotlib.pyplot as plt;
 if opts['--equal']:
     plt.axis('equal');
     r['axes'].autoscale(tight=True);
+if opts['--no-ticks']:
+    plt.tick_params(
+        axis='both',
+        which='both',
+        bottom='off',
+        top='off',
+        right='off',
+        left='off');
+
 if opts['--show']:
     plt.show();
 else:

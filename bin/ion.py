@@ -30,6 +30,8 @@ Options:
     --linthresh=L       Set the linear threshold for SymLogPlot [default: 1.0]
     --linscale=L        Set the linear threshold for SymLogPlot [default: 1.0]
     --cmap=CMAP         Set the colormap. [default: viridis]
+    --equal -E          Make spatial dimensions equal.
+    --no-ticks          Don't include ticks.
 '''
 from docopt import docopt;
 import numpy as np;
@@ -130,6 +132,18 @@ if opts['--laser']:
               color="red", alpha=0.15);
     
 import matplotlib.pyplot as plt;
+if opts['--equal']:
+    plt.axis('equal');
+    r['axes'].autoscale(tight=True);
+if opts['--no-ticks']:
+    plt.tick_params(
+        axis='both',
+        which='both',
+        bottom='off',
+        top='off',
+        right='off',
+        left='off');
+    
 if opts['--show']:
     plt.show();
 else:

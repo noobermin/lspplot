@@ -36,6 +36,9 @@ Options:
     --traj-maxE=E       Set the maximum E in eV explicitly. If set, anything above
                         will be cut off.
     --traj-minE=E       Set the minimum E in eV. [default: 1]
+    --equal -E          Make spatial dimensions equal.
+    --no-ticks          Don't include ticks.
+
 '''
 from docopt import docopt;
 import numpy as np;
@@ -161,6 +164,17 @@ if opts['--traj']:
         coords = list(reversed(coords)),
         cmap   = 'copper',
         color_quantity=cf);
+if opts['--equal']:
+    plt.axis('equal');
+    r['axes'].autoscale(tight=True);
+if opts['--no-ticks']:
+    plt.tick_params(
+        axis='both',
+        which='both',
+        bottom='off',
+        top='off',
+        right='off',
+        left='off');
 if opts['--show']:
     plt.show();
 else:

@@ -117,7 +117,7 @@ def pc(q,p=None,**kw):
     return ret;
 
 def highlight(ret, val,
-              q=None, color='white', alpha=0.15):
+              q=None, color='white', alpha=0.15, erase=False):
     '''
     Highlight a pc. Essentially a wrapper of plt.contour
 
@@ -129,11 +129,11 @@ def highlight(ret, val,
     Keyword Arguments:
       color -- color of highlight
       alpha -- alpha of highlight
+      erase -- erases the highlights. Defaults to false (opposite of matplotlib!)
 
     Returns:
       ret but with stuff that plt.contour adds.
     '''
-
     ax = ret['axes'];
     if q is None:
         q = ret['q'];
@@ -146,7 +146,7 @@ def highlight(ret, val,
                     colors=[color], alpha = alpha);
     ret['cts'].append(ct);
     if q is ret['q']:
-        cbar.add_lines(ct);
+        cbar.add_lines(ct,erase=erase);
     return ret;
 
 trajdefaults = dict(

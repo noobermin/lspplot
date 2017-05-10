@@ -102,7 +102,7 @@ r=pc(
     agg=not opts['--show'],
     orient=orient,);
 
-if opts['--highlight'] and opts['--hightlight'] != "None" and opts['--highlight'] != 'none':
+if opts['--highlight'] and (opts['--hightlight'] != "None" and opts['--highlight'] != 'none'):
     myhi  = float(opts['--highlight']);
     highlight(
         r, myhi,

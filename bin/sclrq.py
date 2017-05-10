@@ -47,7 +47,7 @@ svar=[quantity];
 if opts['--nozip']:
     gzip = False;
 elif opts['--zip']:
-    gzip = True:
+    gzip = True;
 else:
     gzip = 'guess';
 #####################################

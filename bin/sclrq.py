@@ -11,6 +11,8 @@ Options:
     --help -h
     --show -s           Show
     --nozip -U          flds are NOT gzipped.
+    --zip   -Z          flds are gzipped. If neither of these two are set,
+                        guess based on name.
     --log10 -l          Log it.
     --lims=LIM          Set lims [default: (1e18,1e23)]
     --highlight=H       Set highlight.
@@ -24,6 +26,7 @@ Options:
     --intensity=I -I I  Make a contour of this intensity [default: 3e18]
     --equal -E          Make spatial dimensions equal.
     --no-ticks          Don't include ticks.
+    --orientation=V     "V" for vertical or "H" for horizontal [default: V]
 '''
 from docopt import docopt;
 import numpy as np;
@@ -35,13 +38,18 @@ from lspplot.pc import pc,highlight;
 from lspplot.consts import c,mu0,e0;
 
 opts = docopt(__doc__,help=True);
-gzip = not opts['--nozip'];
-quantity = opts['--quantity'];
 
+quantity = opts['--quantity'];
 fvar=['E','B'] if opts['--laser'] else None;
 titlestr=opts['--title']
 units=opts['--units'];
 svar=[quantity];
+if opts['--nozip']:
+    gzip = False;
+elif opts['--zip']:
+    gzip = True:
+else:
+    gzip = 'guess';
 #####################################
 #reading data
 d = read_indexed(int(opts['<i>']),
@@ -77,12 +85,24 @@ mn,mx = parse_ftuple(opts['--lims'],length=2);
 
 #plot the density
 title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6);
+
+#orientation of colorbar
+if opts['--orientation'] == "V":
+    orient = "vertical"
+elif opts['--orientation'] == "H":
+    orient = "horizontal"
+else:
+    print('orientation must be either "V" or "H"');
+    print(__doc__);
+    quit();
+
 r=pc(
     q,(x,y), lims=(mn,mx),log=opts['--log10'],
     clabel=units, title=title,
-    agg=not opts['--show']);
+    agg=not opts['--show'],
+    orient=orient,);
 
-if opts['--highlight']:
+if opts['--highlight'] and opts['--hightlight'] != "None" and opts['--highlight'] != 'none':
     myhi  = float(opts['--highlight']);
     highlight(
         r, myhi,

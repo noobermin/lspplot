@@ -19,6 +19,7 @@ pc_defaults = dict(
     cmap='viridis',
     linthresh=1.0,
     linscale=1.0,
+    orient='vertical',
 )
 
 
@@ -50,6 +51,8 @@ def pc(q,p=None,**kw):
       ylabel -- set ylabel
       title  -- set title
       clabel -- set colorbar label
+      orient -- the orientation for the colorbar.
+      cmap   -- set the colormap.
 
     Returns:
       A dictionary with axes, pcolormesh object,
@@ -94,7 +97,8 @@ def pc(q,p=None,**kw):
     ret['x'],ret['y'] = x,y;
     mypc = ret['pc'] =ax.pcolormesh(
         y,x,q,vmin=mn,vmax=mx,cmap=getkw('cmap'),norm=norm);
-    ret['cbar'] = cbar = plt.colorbar(mypc);
+    ret['cbar'] = cbar = plt.colorbar(
+        mypc,orientation=getkw('orient'));
     if type(norm) is SymLogNorm:
         mnl = int(np.floor(np.log10(-mn)));
         mxl = int(np.floor(np.log10( mx)));

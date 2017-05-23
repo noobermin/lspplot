@@ -189,6 +189,9 @@ def angular(d, phi=None, e=None,
                       and laserE (I only, not E_0). See help for totalKE
                       and laserE.
       F            -- Multiply charges by a factor.
+      dict_return  -- Have the return value be a convenient dictionary
+                      instead of god knows what it currently is (a
+                      tuple of tuple of stuff).
 
     '''
     #reckon the call form
@@ -245,6 +248,8 @@ def angular(d, phi=None, e=None,
         Estep = 10**tenpow;
         if mantissa > 6:
             Estep = 6*10**tenpow;
+    if test(kw,'e_step'):
+        Estep = kw['e_step'];
     maxQ  = getkw('max_q');
     minQ  = getkw('min_q');
     if test(kw,"normalize"):
@@ -380,7 +385,20 @@ def angular(d, phi=None, e=None,
             fig.text(0.60,0.875,kw['rtitle'],fontdict={'fontsize':22});
         else:
             plt.title(kw['rtitle'],loc='right',fontdict={'fontsize':22});
-    return (surf, ax, fig, (phi_bins, E_bins), (phi,e,s));
+    if test(kw, 'dict_return'):
+        return dict(
+            surf=surf,
+            ax=ax,
+            fig=fig,
+            phi_bins=phi_bins,
+            E_bins=E_bins,
+            phi=phi,
+            e=e,
+            s=s,
+            eunits=eunits,
+        );
+    else:
+        return (surf, ax, fig, (phi_bins, E_bins), (phi,e,s));
 
 
 

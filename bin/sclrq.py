@@ -10,8 +10,8 @@ Usage:
 Options:
     --help -h
     --show -s           Show
-    --nozip -U          flds are NOT gzipped.
-    --zip   -Z          flds are gzipped. If neither of these two are set,
+    --nozip -U          sclr/flds are NOT gzipped.
+    --zip   -Z          sclr/flds are gzipped. If neither of these two are set,
                         guess based on name.
     --log10 -l          Log it.
     --lims=LIM          Set lims [default: (1e18,1e23)]

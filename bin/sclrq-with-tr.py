@@ -1,7 +1,8 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 '''
-Just render something...with trajectories
+Just render something...with trajectories.
+This script is stale. Use with caution.
 
 Usage:
     ./sclrq.py [options] (--show|-s) <i>
@@ -11,7 +12,9 @@ Options:
     --help -h
     --show -s           Show
     --verbose -v        Make some noise.
-    --nozip -U          flds are NOT gzipped.
+    --nozip -U          sclr/flds are NOT gzipped.
+    --zip   -Z          sclr/flds are gzipped. If neither of these two are set,
+                        guess based on name.
     --log10 -l          Log it.
     --lims=LIM          Set lims [default: (1e2,6e8)]
     --highlight=H       Set highlight [default: 3e8]
@@ -50,7 +53,12 @@ from lspplot.pc import pc,highlight,trajectories;
 from lspplot.consts import c,mu0,e0;
 
 opts = docopt(__doc__,help=True);
-gzip = not opts['--nozip'];
+if opts['--nozip']:
+    gzip = False;
+elif opts['--zip']:
+    gzip = True;
+else:
+    gzip = 'guess';
 quantity = opts['--quantity'];
 
 fvar=['E','B'] if opts['--laser'] else None;

@@ -11,6 +11,8 @@ Options:
     --help -h
     --show -s          Show
     --nozip -U         flds are NOT gzipped.
+    --zip   -Z         flds are gzipped. If neither of these two are set,
+                       guess based on name.
     --log10 -l         Log it.
     --lims=LIM         Set lims [default: (1e2,6e8)]
     --highlight=H      Set highlight [default: 3e8]
@@ -29,7 +31,12 @@ from lspplot.pc import pc, highlight;
 from lspplot.consts import c,mu0,e0;
 
 opts = docopt(__doc__,help=True);
-gzip = not opts['--nozip'];
+if opts['--nozip']:
+    gzip = False;
+elif opts['--zip']:
+    gzip = True;
+else:
+    gzip = 'guess';
 quantity = opts['--quantity'];
 
 quantities = {

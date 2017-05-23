@@ -10,7 +10,9 @@ Usage:
 Options:
     --help -h
     --show -s           Show
-    --nozip -U          flds are NOT gzipped.
+    --nozip -U          sclr/flds are NOT gzipped.
+    --zip   -Z          sclr/flds are gzipped. If neither of these two are set,
+                        guess based on name.
     --log10 -l          Log it.
     --lims=LIM          Set lims [default: (1e18,1e23)]
     --highlight=H       Set highlight.
@@ -43,7 +45,13 @@ from lspplot.pc import pc,highlight;
 from lspplot.consts import c,mu0,e0;
 import re
 opts = docopt(__doc__,help=True);
-gzip = not opts['--nozip'];
+if opts['--nozip']:
+    gzip = False;
+elif opts['--zip']:
+    gzip = True;
+else:
+    gzip = 'guess';
+
 if not re.match(r" *[\[\(](?:\w+,)*(?:\w+)?[\[\)]", opts['--ions']):
     raise ValueError("--ions argument invalid, see --help");
 charges=parse_ftuple(opts['--charges'],length=None);

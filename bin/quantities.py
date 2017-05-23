@@ -3,6 +3,8 @@
 Output the efficiency of a sim from a pext.py output.
 All units are SI.
 
+This script is garbage. Consider not using it.
+
 Usage:
   quantities.py [options] <input>
 

@@ -20,6 +20,7 @@ Options:
     --dir=D -D D        Read from this dir [default: .]
     --restrict=R        Restrict it.
     --x-restrict=R      Restrict by positions as a 4 tuple.
+    --t-offset=T        Set time offset in fs. [default: 0].
     --title=T           Set the title [default: Electron density]
     --units=U           Set the colorbar units [default: number/cc]
     --laser             Plot contours of the laser poyting vector.
@@ -84,7 +85,8 @@ mn,mx = parse_ftuple(opts['--lims'],length=2);
 
 
 #plot the density
-title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6);
+toff = float(opts['--t-offset']);
+title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6 + toff);
 
 #orientation of colorbar
 if opts['--orientation'] == "V":

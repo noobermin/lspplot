@@ -19,14 +19,15 @@ Options:
     --quantity=Q -Q Q  Render this quantity [default: E_energy]
     --dir=D -D D       Read from this dir [default: .]
     --restrict=R       Restrict it.
-    --target -t        Plot contours of the target.
+    --target=D -t D    Plot contours of this density.
+    --t-offset=T       Set time offset in fs. [default: 0].
 '''
 from docopt import docopt;
 import numpy as np;
 import numpy.linalg as lin;
 from pys import parse_ftuple, parse_ituple;
 from lspreader.flds import read_indexed, restrict
-from lspplot.sclr import S, E_energy,B_energy,EM_energy;
+from lspplot.sclr import S, E_energy,B_energy,EM_energy, vector_norm;
 from lspplot.pc import pc, highlight;
 from lspplot.consts import c,mu0,e0;
 
@@ -39,24 +40,36 @@ else:
     gzip = 'guess';
 quantity = opts['--quantity'];
 
-quantities = {
-    'E_energy':{
+
+
+quantities = dict(
+    E_norm=dict(
+        fvar=['E'],
+        read= lambda d: vector_norm(d,'E')*1e5,
+        title="Electric Field Norm",
+        units="V/m"),
+    E_energy={
         'fvar':['E'], 'read': E_energy,
         'title': "Electric Field Energy",
         'units': "J / cc"},
-    'B_energy': {
+    B_norm=dict(
+        fvar=['B'],
+        read= lambda d: vector_norm(d,'B'),
+        title="Magnetic Field Norm",
+        units="gauss"),
+    B_energy={
         'fvar':['B'], 'read': B_energy,
         'title': "Magnetic Field Energy",
         'units': "J / cc"},
-    'EM_energy': {
+    EM_energy={
         'fvar':['E','B'], 'read': EM_energy,
         'title': "Electromagnetic Field Energy",
         'units': "J / cc"},
-    'S': {
+    S={
         'fvar':['E','B'], 'read': S,
         'title': "Poynting Vector Norm",
         'units': "W / cm$^2$"},
-};
+)
 if quantity not in quantities:
     print("quantity is not one of {}".format(quantities.keys()));
     quit();
@@ -90,7 +103,8 @@ mn,mx = parse_ftuple(opts['--lims'],length=2);
 myhi  = float(opts['--highlight']);
 
 #plot the density
-title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6);
+toff=float(opts['--t-offset']);
+title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6+toff);
 r=pc(
     q,(x,y), lims=(mx,mn),log=opts['--log10'],
     clabel=units, title=title,
@@ -100,14 +114,14 @@ highlight(
     color="lightyellow", alpha=0.5);
 
 if opts['--target']:
+    if opts['--target'] == 'True':
+        H = 1.7e21;
+    else:
+        H = float(opts['--target']);
     ne = d['RhoN10'];
     highlight(
-        r,1e18, q=ne,
+        r, H, q=ne,
         color="red", alpha=0.15);
-    highlight(
-        r, 1.7e21, q=ne,
-        color="red", alpha=0.15);
-
 import matplotlib.pyplot as plt;
 if opts['--show']:
     plt.show();

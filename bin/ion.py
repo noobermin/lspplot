@@ -26,6 +26,7 @@ Options:
     --restrict=R        Restrict it.
     --x-restrict=R      Restrict by positions as a 4 tuple.
     --title=T           Set the title [default: Ion Charge Density]
+    --t-offset=T        Set time offset in fs. [default: 0].
     --units=U           Set the colorbar units [default: e/cc]
     --laser             Plot contours of the laser poyting vector.
     --intensity=I -I I  Make a contour of this intensity [default: 3e18]
@@ -117,7 +118,8 @@ q = np.average(acc,axis=0);
 mn,mx = parse_ftuple(opts['--lims'],length=2);
 
 #plot the density
-title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6);
+toff = float("--t-offset");
+title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6+toff);
 r=pc(
     q,(x,y), lims=(mn,mx),log=opts['--log10'],
     clabel=units, title=title,

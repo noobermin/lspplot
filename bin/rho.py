@@ -20,6 +20,7 @@ Options:
     --dir=D -D D        Read from this dir [default: .]
     --restrict=R        Restrict it.
     --title=T           Set the title [default: Charge Density]
+    --t-offset=T        Set time offset in fs. [default: 0].
     --units=U           Set the colorbar units [default: e/cc ]
     --laser             Plot contours of the laser poyting vector.
     --intensity=I -I I  Make a contour of this intensity [default: 3e18]
@@ -83,7 +84,8 @@ mn,mx = parse_ftuple(opts['--lims'],length=2);
 
 
 #plot the density
-title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6);
+toff = float(opts['--t-offset']);
+title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6+toff);
 r=pc(
     rho,(x,y), lims=(mn,mx),log=opts['--log10'],
     clabel=units, title=title,

@@ -34,8 +34,14 @@ Options:
   --e-units=UNIT              The units for the radial labels.
   --agg -A                    Use the agg backend.
   --lsp -L                    Search for the lsp file in the current directory.
-  --efficiency=E              Calculate the efficiency and display it, pass a tuple
-                              of the energy cut.
+  --efficiency=E              Calculate the efficiency and display it. If you're lucky enough
+                              to format your .lsp files the way I do, you can just set this to 
+                              "wilks" and sedn the -L flag. Otherwise, you can either specify
+                              an energy cut off, or pass a tuple of the form
+                              (I, w, l, T, dim), where I is the intensity in W/cm^2,
+                              w is the gaussian radius, l is the wavelength, T is the FWHM, and
+                              dim is the number of dimensions, and I'll calculate wilks from that.
+                              All units are SI unless otherwise stated.
 '''
 
 from docopt import docopt;

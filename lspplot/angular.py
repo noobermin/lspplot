@@ -502,7 +502,7 @@ def _prepkw(opts):
             vs = parse_ftuple(effs, length=None);
             if len(vs) >= 5:
                 I,w,l,T,dim = vs[:5];
-                dim = int(dim);
+                dim = "{}D".format(int(dim));
                 if len(vs) >= 6:
                     ecut = vs[5];
                 else:

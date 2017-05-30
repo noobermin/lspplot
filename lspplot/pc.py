@@ -3,13 +3,13 @@
 For plotting sclr/flds files.
 '''
 from docopt import docopt;
-from lspreader import misc,read;
+from lspreader import read;
 from lspreader import flds as fldsm;
 from lspreader.lspreader import get_header;
 import numpy as np;
 import numpy.linalg as lin;
 from pys import parse_ftuple,test,takef,mk_getkw;
-from consts import *
+from lspplot.consts import *
 
 pc_defaults = dict(
     xlabel='microns',
@@ -47,6 +47,7 @@ def pc(q,p=None,**kw):
                    SymLogNorm. See the manual for SymLogNorm.
       linscale  -- use this as a value for the linear scale for
                    SymLogNorm. See the manual for SymLogNorm.
+      cbar      -- if set to false, don't output cbar. Default is True.
       xlabel -- set xlabel
       ylabel -- set ylabel
       title  -- set title
@@ -97,8 +98,12 @@ def pc(q,p=None,**kw):
     ret['x'],ret['y'] = x,y;
     mypc = ret['pc'] =ax.pcolormesh(
         y,x,q,vmin=mn,vmax=mx,cmap=getkw('cmap'),norm=norm);
-    ret['cbar'] = cbar = plt.colorbar(
-        mypc,orientation=getkw('orient'));
+    if 'cbar' in kw and kw['cbar'] is False:
+        ret['cbar'] = cbar = None;
+    else:
+        ret['cbar'] = cbar = plt.colorbar(
+            mypc,orientation=getkw('orient'));
+    
     if type(norm) is SymLogNorm:
         mnl = int(np.floor(np.log10(-mn)));
         mxl = int(np.floor(np.log10( mx)));
@@ -111,9 +116,11 @@ def pc(q,p=None,**kw):
             [ "-10$^{{{}}}$".format(int(p)) for p in negpows]
             + ['0']
             + [" 10$^{{{}}}$".format(int(p)) for p in pospows]);
-        cbar.set_ticks(ticks);
-        cbar.set_ticklabels(tlabels);
-    if test(kw,"clabel"):
+        #ugh...
+        if cbar:
+            cbar.set_ticks(ticks);
+            cbar.set_ticklabels(tlabels);
+    if test(kw,"clabel") and cbar:
         cbar.set_label(getkw("clabel"));
     ax.set_xlabel(getkw("xlabel"));
     ax.set_ylabel(getkw("ylabel"));

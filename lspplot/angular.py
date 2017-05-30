@@ -488,12 +488,28 @@ def _prepkw(opts):
         kw['rgridopts'].update({'unit':opts['--e-units']});
     if opts['--normalize']:
         kw['clabel'] += defaults['norm_units'];
-    if opts['--lsp'] and opts['--efficiency']:
+    
+    if opts['--efficiency']:
         massE=float(opts['--massE']);
-        I,w,l,T,dim = _getlsp();
-        ecut = opts['--efficiency']
-        if ecut != 'wilks':
-            ecut = float(opts['--efficiency']);
+        effs = opts['--efficiency'];
+        if opts['--lsp']:
+            I,w,l,T,dim = _getlsp();
+            if effs == "wilks":
+                ecut = 'wilks';
+            else:
+                ecut = float(effs);
+        else:
+            vs = parse_ftuple(effs, length=None);
+            if len(vs) >= 5:
+                I,w,l,T,dim = vs[:5];
+                dim = int(dim);
+                if len(vs) >= 6:
+                    ecut = vs[5];
+                else:
+                    ecut = 'wilks';
+            else:
+                raise ValueError(
+                    "efficiency passed is incorrect. See --help.");
         kw['efficiency'] = dict(
             I=I,w=w,T=T,l=l,dim=dim,
             ecut=ecut, massE=massE);

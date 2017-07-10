@@ -19,7 +19,9 @@ Options:
     --quantity=Q -Q Q  Render this quantity [default: E_energy]
     --dir=D -D D       Read from this dir [default: .]
     --restrict=R       Restrict it.
+    --x-restrict=R     Restrict by positions as a 4 tuple.
     --target=D -t D    Plot contours of this density.
+    --targetq=Q        Set the target quantity [default: RhoN10]
     --t-offset=T       Set time offset in fs. [default: 0].
 '''
 from docopt import docopt;
@@ -77,14 +79,23 @@ fvar=quantities[quantity]['fvar']
 read=quantities[quantity]['read']
 titlestr=quantities[quantity]['title']
 units=quantities[quantity]['units']
-svar=['RhoN10'] if opts['--target'] else None;
+targetq = opts['--targetq'];
+svar=[targetq] if opts['--target'] else None;
 #####################################
 #reading data
 d = read_indexed(int(opts['<i>']),
     flds=fvar,sclr=svar,
     gzip=gzip,dir=opts['--dir'],
               gettime=True,vector_norms=False);
-if opts['--restrict']:
+if opts['--x-restrict']:
+    res = parse_ftuple(opts['--x-restrict'], length=4);
+    res[:2] = [ np.abs(d['x'][:,0]*1e4 - ires).argmin() for ires in res[:2] ];
+    res[2:] = [ np.abs(d[ylabel][0,:]*1e4 - ires).argmin() for ires in res[2:] ];
+    #including the edges
+    res[1]+=1;
+    res[3]+=1;
+    restrict(d,res);
+elif opts['--restrict']:
     res = parse_ituple(opts['--restrict'],length=None);
     restrict(d,res);
 
@@ -118,7 +129,7 @@ if opts['--target']:
         H = 1.7e21;
     else:
         H = float(opts['--target']);
-    ne = d['RhoN10'];
+    ne = d[targetq];
     highlight(
         r, H, q=ne,
         color="red", alpha=0.15);

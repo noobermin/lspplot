@@ -16,18 +16,26 @@ Options:
     --log10 -l         Log it.
     --lims=LIM         Set lims [default: (1e2,6e8)]
     --highlight=H      Set highlight [default: 3e8]
-    --quantity=Q -Q Q  Render this quantity [default: E_energy]
+    --quantity=Q -Q Q  Render this quantity. Quantities are E_norm, E_energy,
+                       B_norm, B_energy, EM_energy, and S. [default: E_energy]
     --dir=D -D D       Read from this dir [default: .]
     --restrict=R       Restrict it.
     --x-restrict=R     Restrict by positions as a 4 tuple.
-    --target=D -t D    Plot contours of this density.
-    --targetq=Q        Set the target quantity [default: RhoN10]
+    --target=D -t D    Plot contours of this density. If D is a list,
+                       plot multiple contours.
+    --targetc=C        Set these colors for the contours. If C is a list,
+                       plot these colors. [default: darkred]
+    --targeta=A        Set the target alphas. If A is a list
+                       plot multiple alphas. [default: 0.15]
+    --targetq=Q        Set the target quantity. If Q is a list
+                       plot multiple quantities. [default: RhoN10]
+    --equal -E         Make spatial dimensions equal.
     --t-offset=T       Set time offset in fs. [default: 0].
 '''
 from docopt import docopt;
 import numpy as np;
 import numpy.linalg as lin;
-from pys import parse_ftuple, parse_ituple;
+from pys import parse_ftuple, parse_ituple, fltrx_s, srx_s, rgbrx, quote_subs
 from lspreader.flds import read_indexed, restrict
 from lspplot.sclr import S, E_energy,B_energy,EM_energy, vector_norm;
 from lspplot.pc import pc, highlight;
@@ -124,16 +132,45 @@ highlight(
     r, myhi,
     color="lightyellow", alpha=0.5);
 
+def parse_slist(s):
+    
 if opts['--target']:
+    def parseit(s,rx,parsef=parse_ftuple,quote=False):
+        if re.search(rx, s):
+            if quote:
+                s = quote_subs(s);
+            return [eval(s)]
+        else:
+            return parsef(s, length=None);
+    
     if opts['--target'] == 'True':
-        H = 1.7e21;
+        H = [1.7e21];
     else:
-        H = float(opts['--target']);
-    ne = d[targetq];
-    highlight(
-        r, H, q=ne,
-        color="red", alpha=0.15);
+        H = parseit(opts['--target'], fltrx);
+
+    rgbrx_s = r"\( *(?:{numrx} *, *){{{rep1}}}{numrx} *,{{0,1}} *\)".format(
+        rep1=2,
+        numrx=fltrx_s);
+    crx_s = "(?:{srx}|{rgbrx})".format(srx=srx_s,rgbrx_s);
+    
+    C = parseit(crx_s, opts['--targetc'],parsef=parse_ctuple, quote=True);
+    Q = parseit(srx_s, opts['--targetq'],parsef=parse_stuple, quote=True);
+    A = parseit(fltrx_s, opts['--targeta']);
+
+    def lenl(I):
+        if len(I) == 1:
+            I = I*len(H)
+        return I;
+    C = lenl(C);
+    Q = lenl(I);
+    A = lenl(A);
+    for h,c,q,a for zip(H,C,Q,A):
+        ne = d[q];
+        highlight(r, H, q=ne, color=c, alpha=a);
 import matplotlib.pyplot as plt;
+if opts['--equal']:
+    plt.axis('equal');
+    r['axes'].autoscale(tight=True);
 if opts['--show']:
     plt.show();
 else:

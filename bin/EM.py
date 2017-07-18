@@ -15,7 +15,7 @@ Options:
                        guess based on name.
     --log10 -l         Log it.
     --lims=LIM         Set lims [default: (1e2,6e8)]
-    --highlight=H      Set highlight [default: 3e8]
+    --highlight=H      Set highlight for field quantity.
     --quantity=Q -Q Q  Render this quantity. Quantities are E_norm, E_energy,
                        B_norm, B_energy, EM_energy, and S. [default: E_energy]
     --dir=D -D D       Read from this dir [default: .]
@@ -35,11 +35,13 @@ Options:
 from docopt import docopt;
 import numpy as np;
 import numpy.linalg as lin;
-from pys import parse_ftuple, parse_ituple, fltrx_s, srx_s, rgbrx, quote_subs
+from pys import parse_ftuple, parse_ituple, parse_ctuple, parse_stuple;
+from pys import fltrx_s, srx_s, rgbrx_s, quote_subs
 from lspreader.flds import read_indexed, restrict
 from lspplot.sclr import S, E_energy,B_energy,EM_energy, vector_norm;
 from lspplot.pc import pc, highlight;
 from lspplot.consts import c,mu0,e0;
+import re;
 
 opts = docopt(__doc__,help=True);
 if opts['--nozip']:
@@ -119,7 +121,6 @@ q = read(d);
 
 #getting options from user
 mn,mx = parse_ftuple(opts['--lims'],length=2);
-myhi  = float(opts['--highlight']);
 
 #plot the density
 toff=float(opts['--t-offset']);
@@ -128,15 +129,16 @@ r=pc(
     q,(x,y), lims=(mx,mn),log=opts['--log10'],
     clabel=units, title=title,
     agg=True);
-highlight(
-    r, myhi,
-    color="lightyellow", alpha=0.5);
+if opts['--highlight']:
+    highlight(
+        r, float(opts['--highlight']),
+        color="lightyellow", alpha=0.5);
 
-def parse_slist(s):
     
 if opts['--target']:
-    def parseit(s,rx,parsef=parse_ftuple,quote=False):
-        if re.search(rx, s):
+    def parseit(s,rx=fltrx_s,parsef=parse_ftuple,quote=False):
+        #this needs to be match! not search to not match parens.
+        if re.match(rx, s):
             if quote:
                 s = quote_subs(s);
             return [eval(s)]
@@ -146,27 +148,24 @@ if opts['--target']:
     if opts['--target'] == 'True':
         H = [1.7e21];
     else:
-        H = parseit(opts['--target'], fltrx);
-
+        H = parseit(opts['--target']);
     rgbrx_s = r"\( *(?:{numrx} *, *){{{rep1}}}{numrx} *,{{0,1}} *\)".format(
         rep1=2,
         numrx=fltrx_s);
-    crx_s = "(?:{srx}|{rgbrx})".format(srx=srx_s,rgbrx_s);
+    crx_s = "(?:{srx}|{rgbrx})".format(srx=srx_s,rgbrx=rgbrx_s);
     
-    C = parseit(crx_s, opts['--targetc'],parsef=parse_ctuple, quote=True);
-    Q = parseit(srx_s, opts['--targetq'],parsef=parse_stuple, quote=True);
-    A = parseit(fltrx_s, opts['--targeta']);
-
+    C = parseit(opts['--targetc'], rx=crx_s, parsef=parse_ctuple, quote=True);
+    Q = parseit(opts['--targetq'], rx=srx_s, parsef=parse_stuple, quote=True);
+    A = parseit(opts['--targeta']);
     def lenl(I):
         if len(I) == 1:
-            I = I*len(H)
+            I = I*len(H);
         return I;
     C = lenl(C);
-    Q = lenl(I);
+    Q = lenl(Q);
     A = lenl(A);
-    for h,c,q,a for zip(H,C,Q,A):
-        ne = d[q];
-        highlight(r, H, q=ne, color=c, alpha=a);
+    for h,c,q,a in zip(H,C,Q,A):
+        highlight(r, h, q=d[q], color=c, alpha=a);
 import matplotlib.pyplot as plt;
 if opts['--equal']:
     plt.axis('equal');
@@ -175,5 +174,3 @@ if opts['--show']:
     plt.show();
 else:
     plt.savefig(opts['<outname>']);
-
-

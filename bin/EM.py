@@ -50,10 +50,19 @@ elif opts['--zip']:
     gzip = True;
 else:
     gzip = 'guess';
+
+def parseit(s,rx=fltrx_s,parsef=parse_ftuple,quote=False):
+    ''' helper for parsing tuples '''
+    #this needs to be match! not search to not match parens.
+    if re.match(rx, s):
+        if quote:
+            s = quote_subs(s);
+        return [eval(s)]
+    else:
+        return parsef(s, length=None);
+    
+
 quantity = opts['--quantity'];
-
-
-
 quantities = dict(
     E_norm=dict(
         fvar=['E'],
@@ -89,8 +98,13 @@ fvar=quantities[quantity]['fvar']
 read=quantities[quantity]['read']
 titlestr=quantities[quantity]['title']
 units=quantities[quantity]['units']
-targetq = opts['--targetq'];
-svar=[targetq] if opts['--target'] else None;
+
+if opts['--target']:
+    svar = parseit(opts['--targetq'], rx=srx_s,parsef=parse_stuple,quote=True)
+    #unique
+    svar = list(set(svar));
+else:
+    svar = None;
 #####################################
 #reading data
 d = read_indexed(int(opts['<i>']),
@@ -135,16 +149,7 @@ if opts['--highlight']:
         color="lightyellow", alpha=0.5);
 
     
-if opts['--target']:
-    def parseit(s,rx=fltrx_s,parsef=parse_ftuple,quote=False):
-        #this needs to be match! not search to not match parens.
-        if re.match(rx, s):
-            if quote:
-                s = quote_subs(s);
-            return [eval(s)]
-        else:
-            return parsef(s, length=None);
-    
+if opts['--target']:    
     if opts['--target'] == 'True':
         H = [1.7e21];
     else:

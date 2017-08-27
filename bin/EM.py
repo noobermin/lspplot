@@ -30,6 +30,7 @@ Options:
     --targetq=Q        Set the target quantity. If Q is a list
                        plot multiple quantities. [default: RhoN10]
     --equal -E         Make spatial dimensions equal.
+    --blur=R           Blur with this radius.
     --t-offset=T       Set time offset in fs. [default: 0].
 '''
 from docopt import docopt;
@@ -38,9 +39,10 @@ import numpy.linalg as lin;
 from pys import parse_ftuple, parse_ituple, parse_ctuple, parse_stuple;
 from pys import fltrx_s, srx_s, rgbrx_s, quote_subs
 from lspreader.flds import read_indexed, restrict
-from lspplot.sclr import S, E_energy,B_energy,EM_energy, vector_norm;
+from lspplot.sclr import S, E_energy,B_energy,EM_energy, vector_norm, smooth2Dp;
 from lspplot.pc import pc, highlight;
 from lspplot.consts import c,mu0,e0;
+
 import re;
 
 opts = docopt(__doc__,help=True);
@@ -130,6 +132,12 @@ t  = d['t'];
 x,y = d['x']*1e4,d[ylabel]*1e4
 q = read(d);
 
+if opts['--blur']:
+    rad = float(opts['--blur']);
+    w=rad*6;
+    q,x,y = smooth2Dp(
+        q, (x,y), [0.1,0.1], [0.6,0.6]);
+
 #####################################
 #plotting
 
@@ -170,7 +178,12 @@ if opts['--target']:
     Q = lenl(Q);
     A = lenl(A);
     for h,c,q,a in zip(H,C,Q,A):
-        highlight(r, h, q=d[q], color=c, alpha=a);
+        cq=d[q];
+        if opts['--blur']:
+            offx=(d[q].shape[0]-q.shape[0])/2
+            offy=(d[q].shape[1]-q.shape[1])/2
+            cq = cq[offx:-offx,offy:-offy];
+        highlight(r, h, q=cq, color=c, alpha=a);
 import matplotlib.pyplot as plt;
 if opts['--equal']:
     plt.axis('equal');

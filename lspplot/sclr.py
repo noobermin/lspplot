@@ -107,7 +107,7 @@ def smooth2Dp(q, p, s, w,
         X,Y=np.mgrid[-w[0]/2.0:w[0]/2.0:dx,
                      -w[1]/2.0:w[1]/2.0:dy]
         #gaussian kernel, of course
-        kern = np.exp(-( (X/(2*s[0]))**2 + (Y/(2*s[1]))**2));
+        kern = np.exp(-( (X/s[0])**2 + (Y/s[1])**2)/2.0 );
         kern = kern/np.sum(kern);
     else:
         raise ValueError('Unknown type "{}"'.format(type));

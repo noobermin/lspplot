@@ -177,11 +177,11 @@ if opts['--target']:
     C = lenl(C);
     Q = lenl(Q);
     A = lenl(A);
-    for h,c,q,a in zip(H,C,Q,A):
-        cq=d[q];
+    for h,c,l,a in zip(H,C,Q,A):
+        cq=d[l];
         if opts['--blur']:
-            offx=(d[q].shape[0]-q.shape[0])/2
-            offy=(d[q].shape[1]-q.shape[1])/2
+            offx=(d[l].shape[0]-q.shape[0])/2
+            offy=(d[l].shape[1]-q.shape[1])/2
             cq = cq[offx:-offx,offy:-offy];
         highlight(r, h, q=cq, color=c, alpha=a);
 import matplotlib.pyplot as plt;

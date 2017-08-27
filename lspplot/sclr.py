@@ -5,6 +5,7 @@ For plotting sclr/flds files.
 from lspreader import read;
 from lspreader import flds as fldsm;
 from lspreader.lspreader import get_header;
+from scipy.signal import convolve;
 import numpy as np;
 import numpy.linalg as lin;
 from pys import parse_ftuple,test,takef;
@@ -88,6 +89,39 @@ def restrict(d,restrict):
     else:
         raise ValueError("restrict of length {} is not valid".format(
             len(restrict)));
+
+def twodme(x):
+    if type(x) == float:
+        x = np.array([x,x]);
+    return x;
+def smooth2D(d,l,
+             s=1.0,w=6.0,
+             type='gauss',
+             mode='valid',
+             clip=True):
+    s=twodme(s*1e-4);
+    w=twodme(w*1e-4);
+    if len(d[l].shape)>2:
+        raise ValueError("Only for 2D");
+    yl =  'y' if 'y' in d else 'z';
+    dx = np.abs(d['x'][1,0]-d['x'][0,0]);
+    dy = np.abs(d[ yl][0,1]-d[ yl][0,0]);
+    if type=='gauss':
+        Y,X=np.mgrid[-w[0]/2.0:w[0]/2.0:dy,
+                     -w[1]/2.0:w[1]/2.0:dx]
+        #gaussian kernel, of course
+        kern = np.exp(-( (Y/(2*s[0]))**2 + (X/(2*s[1]))**2));
+        kern = kern/np.sum(kern);
+    else:
+        raise ValueError('Unknown type "{}"'.format(type));
+    if mode!='valid':
+        print("warning: use modes other than 'valid' at your own risk");
+    ret=convolve(d[l],kern,mode=mode);
+    #someone tell me why
+    if clip: ret[ret<0]=0;
+    offx=(d['x'].shape[0]-ret.shape[0])/2;
+    offy=(d[yl].shape[1] -ret.shape[1])/2;
+    return ret, d['x'][offx:-offx,offy:-offy], d['y'][offx:-offx,offy:-offy];
 
 
 def E_energy(d):

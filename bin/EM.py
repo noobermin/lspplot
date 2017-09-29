@@ -93,6 +93,14 @@ quantities = dict(
         'title': "Poynting Vector Norm",
         'units': "W / cm$^2$"},
 )
+quantities.update({ '{}{}'.format(field,comp):dict(
+    fvar = [field],
+    title='{} field {} component'.format(field,comp),
+    units=unit,
+    read = lambda d: d['{}{}'.format(field,comp)]*scale,)
+  for field,unit,scale in [('E','V/m',1e5),('B','gauss',1.0)]
+  for comp in ['x','y','z'] });
+
 if quantity not in quantities:
     print("quantity is not one of {}".format(quantities.keys()));
     quit();

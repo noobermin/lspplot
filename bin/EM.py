@@ -29,6 +29,9 @@ Options:
                        plot multiple alphas. [default: 0.15]
     --targetq=Q        Set the target quantity. If Q is a list
                        plot multiple quantities. [default: RhoN10]
+    --linthresh=L      Set the linear threshold for SymLogPlot [default: 1e7]
+    --linscale=L       Set the linear threshold for SymLogPlot [default: 1e7]
+    --cmap=CMAP        Set the colormap. [default: viridis]
     --equal -E         Make spatial dimensions equal.
     --blur=R           Blur with this radius.
     --t-offset=T       Set time offset in fs. [default: 0].
@@ -104,7 +107,7 @@ quantities.update({ '{}{}'.format(field,comp):dict(
 if quantity not in quantities:
     print("quantity is not one of {}".format(quantities.keys()));
     quit();
-fvar=quantities[quantity]['fvar']
+1fvar=quantities[quantity]['fvar']
 read=quantities[quantity]['read']
 titlestr=quantities[quantity]['title']
 units=quantities[quantity]['units']
@@ -158,13 +161,16 @@ title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6+toff);
 r=pc(
     q,(x,y), lims=(mx,mn),log=opts['--log10'],
     clabel=units, title=title,
-    agg=True);
+    agg=not opts['--show']
+    linthresh=float(opts['--linthresh']),
+    linscale=float(opts['--linscale']),
+    cmap=opts['--cmap'],);
+
 if opts['--highlight']:
     highlight(
         r, float(opts['--highlight']),
         color="lightyellow", alpha=0.5);
 
-    
 if opts['--target']:    
     if opts['--target'] == 'True':
         H = [1.7e21];

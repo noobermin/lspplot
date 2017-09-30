@@ -161,7 +161,7 @@ title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6+toff);
 r=pc(
     q,(x,y), lims=(mx,mn),log=opts['--log10'],
     clabel=units, title=title,
-    agg=not opts['--show']
+    agg=not opts['--show'],
     linthresh=float(opts['--linthresh']),
     linscale=float(opts['--linscale']),
     cmap=opts['--cmap'],);

@@ -164,7 +164,7 @@ mn,mx = parse_ftuple(opts['--lims'],length=2);
 toff=float(opts['--t-offset']);
 title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6+toff);
 r=pc(
-    q,(x,y), lims=(mx,mn),log=opts['--log10'],
+    q,(x,y), lims=(mn,mx),log=opts['--log10'],
     clabel=units, title=title,
     agg=not opts['--show'],
     linthresh=float(opts['--linthresh']),

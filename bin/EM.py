@@ -96,11 +96,16 @@ quantities = dict(
         'title': "Poynting Vector Norm",
         'units': "W / cm$^2$"},
 )
+def mkread(s,N):
+    '''lambda's aren't great.'''
+    def _f(d):
+        return d[s]*N;
+    return _f;
 quantities.update({ '{}{}'.format(field,comp):dict(
     fvar = [field],
     title='{} field {} component'.format(field,comp),
     units=unit,
-    read = lambda d: d['{}{}'.format(field,comp)]*scale,)
+    read = mkread('{}{}'.format(field,comp),scale))
   for field,unit,scale in [('E','V/m',1e5),('B','gauss',1.0)]
   for comp in ['x','y','z'] });
 

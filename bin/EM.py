@@ -107,7 +107,7 @@ quantities.update({ '{}{}'.format(field,comp):dict(
 if quantity not in quantities:
     print("quantity is not one of {}".format(quantities.keys()));
     quit();
-1fvar=quantities[quantity]['fvar']
+fvar=quantities[quantity]['fvar']
 read=quantities[quantity]['read']
 titlestr=quantities[quantity]['title']
 units=quantities[quantity]['units']

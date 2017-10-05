@@ -35,6 +35,25 @@ Options:
     --equal -E         Make spatial dimensions equal.
     --blur=R           Blur with this radius.
     --t-offset=T       Set time offset in fs. [default: 0].
+    --traj=F           Plot trajectories from this file. If not used,
+                       will not plot trajectories.
+    --traj-offset=O    Set the offset and factor to get the relevant
+                       trajectory timestep such that i_t = factor*i+offset, where
+                       i is the passed index in <i>. The factor and offset are passed
+                       to this option in the form of a tuple (factor, offset). If not
+                       used, script will search for the closest time in the trajectory
+                       file.
+    --traj-tail=T      Set the "length" in time of the tail. Accepts "inf" which means for
+                       all times, otherwise subtract from the time determined by other
+                       options and move back that many steps in fs. [default: inf]
+    --traj-n=N         Plot only first N trajectories. Pass a 3-tuple in order to slice.
+    --traj-energy      Color the trajectory lines by their energy.
+    --traj-mass        Set the rest mass of the pmovie particles. [default: 0.511e6]
+    --traj-E-log       Logarithmic color for trajectories.
+    --traj-maxE=E      Set the maximum E in eV explicitly. If set, anything above
+                       will be cut off.
+    --traj-minE=E      Set the minimum E in eV. [default: 1]
+    --traj-newfmt      Use the new trajectory format.
 '''
 from docopt import docopt;
 import numpy as np;
@@ -43,9 +62,8 @@ from pys import parse_ftuple, parse_ituple, parse_ctuple, parse_stuple;
 from pys import fltrx_s, srx_s, rgbrx_s, quote_subs
 from lspreader.flds import read_indexed, restrict
 from lspplot.sclr import S, E_energy,B_energy,EM_energy, vector_norm, smooth2Dp;
-from lspplot.pc import pc, highlight;
+from lspplot.pc import pc, highlight, trajectories;
 from lspplot.consts import c,mu0,e0;
-
 import re;
 
 opts = docopt(__doc__,help=True);
@@ -142,7 +160,7 @@ if opts['--x-restrict']:
 elif opts['--restrict']:
     res = parse_ituple(opts['--restrict'],length=None);
     restrict(d,res);
-
+####################################
 #massaging data
 t  = d['t'];
 x,y = d['x']*1e4,d[ylabel]*1e4
@@ -154,6 +172,53 @@ if opts['--blur']:
     q,x,y = smooth2Dp(
         q, (x,y), [0.1,0.1], [0.6,0.6]);
 
+#trajectories
+if opts['--traj']:
+    factor, offset = None, None;
+    if opts['--traj-offset']:
+        factor, offset = parse_ituple(opts['--traj-offset'],length=2);
+    with np.load(opts['--traj'], mmap_mode='r') as f:
+        if factor:
+            tri = i*factor+offset;
+            trt = f['time'][tri];
+            if not np.isclose(trt,t):
+                import sys
+                sys.stderr.write(
+                    "warning: time from trajectory is {} while time from sclr is {}\n".format(
+                        trt,t));
+        else:
+            tri = np.sum((f['time'] <= t).astype(int));
+            trt = f['time'][tri];
+        tri_start=None;
+        if opts['--traj-tail'] != 'inf':
+            tail = float(opts['--traj-tail'])*1e-15*1e9;
+            tri_start = np.sum((f['time'] <= t-tail).astype(int));
+        pn_end=None;
+        pn_start=0;
+        pn_step=1;
+        if opts['--traj-n']:
+            if re.match('^[0-9]+$',opts['--traj-n']):
+                pn_end=int(opts['--traj-n']);
+            else:
+                pn_start,pn_end,pn_step=parse_ituple(opts['--traj-n'],length=3);
+        if not opts['--traj-newfmt']:
+            tr = f['data'][tri_start:tri+1, pn_start:pn_end:pn_step];
+        else:
+            keys = list(f.keys());
+            ps = len(keys) - 1;
+            #magic, think about it
+            sz = len(keys[0] if keys[0] != 'time' else keys[1])
+            fmt ='{{:0{}}}'.format(sz);
+            if pn_end is None: pn_end = ps;
+            tr = np.array([
+                f[fmt.format(i)][tri_start:tri+1] for i in range(pn_start,pn_end,pn_step) ]).T
+    if opts['--verbose']:
+        print("size of trajectories: {}".format(tr.shape));
+        print("final time is {}".format(trt));
+        print("with sclr time as {}".format(t));
+    pass;
+
+    
 #####################################
 #plotting
 
@@ -203,6 +268,46 @@ if opts['--target']:
             offy=(d[l].shape[1]-q.shape[1])/2
             cq = cq[offx:-offx,offy:-offy];
         highlight(r, h, q=cq, color=c, alpha=a);
+gm = lambda itr: np.sqrt(itr['ux']**2+itr['uy']**2+itr['uz']**2+1);
+massE = float(opts['--traj-mass']);
+if opts['--traj']:
+    tr[coords[1]]*=1e4;
+    tr[coords[0]]*=1e4;
+    if opts['--traj-energy']:
+        en = lambda itr:np.nan_to_num(massE*(gm(itr)-1));
+        if opts['--traj-E-log']:
+            minE = float(opts['--traj-minE']);
+            def _energy(itr):
+                E = en(itr);
+                return np.log10(
+                    np.where(E < minE, minE, E));
+            energy=_energy;
+        else:
+            energy=en;
+        #find max energy
+        if opts['--traj-maxE']:
+            maxE=float(opts['--traj-maxE']);
+            def _cf(itr):
+                E = energy(itr);
+                return np.where(E>maxE, 1.0, E/maxE)
+            cf = _cf;
+        else:
+            maxE=np.max(energy(tr));
+            cf = lambda itr: energy(itr)/maxE;
+    else:
+        cf = None;
+    #massaging alpha
+    maxq=np.log10(np.max(np.abs(tr['q'])[0,:]));
+    alphaf = lambda itr: np.log10(np.abs(itr['q'])[0])/maxq
+    trajectories(
+        r, tr,
+        alpha=alphaf,
+        lw=0,
+        coords = list(reversed(coords)),
+        cmap   = 'copper',
+        color_quantity=cf);
+
+
 import matplotlib.pyplot as plt;
 if opts['--equal']:
     plt.axis('equal');

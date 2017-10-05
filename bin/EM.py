@@ -272,8 +272,8 @@ if opts['--target']:
 gm = lambda itr: np.sqrt(itr['ux']**2+itr['uy']**2+itr['uz']**2+1);
 massE = float(opts['--traj-mass']);
 if opts['--traj']:
-    tr[coords[1]]*=1e4;
-    tr[coords[0]]*=1e4;
+    tr[ylabel]*=1e4;
+    tr['x']*=1e4;
     if opts['--traj-energy']:
         en = lambda itr:np.nan_to_num(massE*(gm(itr)-1));
         if opts['--traj-E-log']:

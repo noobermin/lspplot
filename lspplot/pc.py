@@ -170,6 +170,7 @@ trajdefaults = dict(
     marker='o',
     size=1,
     lw=0.1,
+    scale =[1.0,1.0],
 );
     
 def trajectories(ret,trajs,**kw):
@@ -195,13 +196,15 @@ def trajectories(ret,trajs,**kw):
                        If this is a str, assume 1). Otherwise let the
                        color of the traj be color_quantity(itr) where
                        itr is a row in trajs. If none, just plot a line.
+      scale     -- scale the coordinates.
 
     Returns:
       None.
     '''
 
     getkw=mk_getkw(kw, trajdefaults);
-    x,y = getkw("coords");
+    xl,yl = getkw("coords");
+    xs,ys = getkw("scale");
     if not test(kw, "no_resize"):
         xlim, ylim = ret['axes'].get_xlim(), ret['axes'].get_ylim();
     alpha = getkw('alpha');
@@ -212,7 +215,7 @@ def trajectories(ret,trajs,**kw):
         af = lambda itr: alpha;
     if not test(kw,"color_quantity"):
         plotit = lambda itr: ret['axes'].plot(
-            itr[x], itr[y],
+            itr[xl]*xs, itr[yl]*ys,
             lw=getkw('lw'),
             alpha=af(itr),
             c=getkw('color'),);
@@ -222,7 +225,7 @@ def trajectories(ret,trajs,**kw):
         if type(cf) == str:
             cf = lambda itr: itr[cf];
         plotit = lambda itr: ret['axes'].scatter(
-            itr[x], itr[y],
+            itr[xl]*xs, itr[yl]*ys,
             c=cf(itr),
             lw=getkw('lw'),
             s=getkw('size'),

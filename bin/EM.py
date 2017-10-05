@@ -304,7 +304,7 @@ if opts['--traj']:
         r, tr,
         alpha=alphaf,
         lw=0,
-        coords = list(reversed(coords)),
+        coords = [ylabel,'x'],
         cmap   = 'copper',
         color_quantity=cf);
 

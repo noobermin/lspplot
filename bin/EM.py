@@ -10,6 +10,7 @@ Usage:
 Options:
     --help -h
     --show -s          Show
+    --verbose -v       Make some noise.
     --nozip -U         flds are NOT gzipped.
     --zip   -Z         flds are gzipped. If neither of these two are set,
                        guess based on name.

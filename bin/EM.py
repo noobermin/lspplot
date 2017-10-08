@@ -55,6 +55,7 @@ Options:
                        will be cut off.
     --traj-minE=E      Set the minimum E in eV. [default: 1]
     --traj-newfmt      Use the new trajectory format.
+    --traj-qlinear     Use linear easing for trajectories instead of log-ish.
 '''
 from docopt import docopt;
 import numpy as np;
@@ -301,8 +302,12 @@ if opts['--traj']:
     else:
         cf = None;
     #massaging alpha
-    maxq=np.log10(np.max(np.abs(tr['q'])[0,:]));
-    alphaf = lambda itr: np.log10(np.abs(itr['q'])[0])/maxq
+    maxq=np.max(np.abs(tr['q'])[0,:]);
+    if opts['--traj-qinvpow']:
+        p = 1.0/float(opts['--traj-qinvpow']);
+        alphaf = lambda itr: (np.abs(itr['q'])[0]/maxq)**p
+    else:
+        alphaf = lambda itr: np.abs(itr['q'])[0]/maxq
     trajectories(
         r, tr,
         alpha=alphaf,

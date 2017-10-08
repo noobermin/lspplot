@@ -309,6 +309,7 @@ if opts['--traj']:
         lw=0,
         coords = [ylabel,'x'],
         cmap   = 'copper',
+        simple = True,
         color_quantity=cf);
 
 

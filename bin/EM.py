@@ -55,7 +55,7 @@ Options:
                        will be cut off.
     --traj-minE=E      Set the minimum E in eV. [default: 1]
     --traj-newfmt      Use the new trajectory format.
-    --traj-qinvpow     Use an inverse power for the charge to alpha instead of
+    --traj-qinvpow=P   Use an inverse power for the charge to alpha instead of
                        linear easing. [default: 2.0]
 '''
 from docopt import docopt;

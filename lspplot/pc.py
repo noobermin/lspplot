@@ -218,7 +218,7 @@ def trajectories(ret,trajs,**kw):
             itr[xl].ravel()*xs, itr[yl].ravel()*ys,
             lw=getkw('lw'),
             s=getkw('size'),
-            alpha=af(itr),
+            alpha=af(itr).ravel(),
             c=getkw('color'),);
         pass;
     else:

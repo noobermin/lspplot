@@ -215,7 +215,7 @@ def trajectories(ret,trajs,**kw):
         af = lambda itr: alpha;
     if not test(kw,"color_quantity"):
         plotit = lambda itr: ret['axes'].scatter(
-            itr[xl]*xs, itr[yl]*ys,
+            itr[xl].ravel()*xs, itr[yl].ravel()*ys,
             lw=getkw('lw'),
             s=getkw('size'),
             alpha=af(itr),
@@ -226,11 +226,11 @@ def trajectories(ret,trajs,**kw):
         if type(cf) == str:
             cf = lambda itr: itr[cf];
         plotit = lambda itr: ret['axes'].scatter(
-            itr[xl]*xs, itr[yl]*ys,
+            itr[xl].ravel()*xs, itr[yl].ravel()*ys,
             c=cf(itr),
             lw=getkw('lw'),
             s=getkw('size'),
-            alpha=af(itr),
+            alpha=af(itr).ravel(),
             cmap=getkw('cmap'));
     if test(kw, 'simple'):
         plotit(trajs);

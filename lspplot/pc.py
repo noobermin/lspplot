@@ -218,7 +218,7 @@ def trajectories(ret,trajs,**kw):
             itr[xl].ravel()*xs, itr[yl].ravel()*ys,
             lw=getkw('lw'),
             s=getkw('size'),
-            alpha=af(itr).ravel(),
+            alpha=af(itr),
             c=getkw('color'),);
         pass;
     else:
@@ -230,7 +230,7 @@ def trajectories(ret,trajs,**kw):
             c=cf(itr),
             lw=getkw('lw'),
             s=getkw('size'),
-            alpha=af(itr).ravel(),
+            alpha=af(itr),
             cmap=getkw('cmap'));
     if test(kw, 'simple'):
         plotit(trajs);

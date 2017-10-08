@@ -184,8 +184,8 @@ def trajectories(ret,trajs,**kw):
                scheme.
 
     Keyword Arguments:
-      coords    -- coordinates to plot as list of field names
-      no_resize -- avoid resizing the axes which happens if the
+      coords    -- coordinates to plot as1l2 list of field names
+      no_resize -- avoid resizing the axekms which happens if the
                    trajectories fall outside of the current axes.
       lw        -- line width of traj
       color     -- color of traj
@@ -197,7 +197,7 @@ def trajectories(ret,trajs,**kw):
                        color of the traj be color_quantity(itr) where
                        itr is a row in trajs. If none, just plot a line.
       scale     -- scale the coordinates.
-
+      simple    -- simple scatter.
     Returns:
       None.
     '''
@@ -214,9 +214,10 @@ def trajectories(ret,trajs,**kw):
     elif type(alpha) == float:
         af = lambda itr: alpha;
     if not test(kw,"color_quantity"):
-        plotit = lambda itr: ret['axes'].plot(
+        plotit = lambda itr: ret['axes'].scatter(
             itr[xl]*xs, itr[yl]*ys,
             lw=getkw('lw'),
+            s=getkw('size'),
             alpha=af(itr),
             c=getkw('color'),);
         pass;
@@ -231,9 +232,12 @@ def trajectories(ret,trajs,**kw):
             s=getkw('size'),
             alpha=af(itr),
             cmap=getkw('cmap'));
-    
-    for itr in np.rollaxis(trajs,1):
-        plotit(itr);
+    if test(kw, 'simple'):
+        plotit(trajs);
+    else:
+        for itr in np.rollaxis(trajs,1):
+            plotit(itr);
     if not test(kw, "no_resize"):
         ret['axes'].set_xlim(xlim);
         ret['axes'].set_ylim(ylim);
+    

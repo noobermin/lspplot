@@ -148,6 +148,7 @@ d = read_indexed(int(opts['<i>']),
     flds=fvar,sclr=svar,
     gzip=gzip,dir=opts['--dir'],
               gettime=True,vector_norms=False);
+t  = d['t'];
 #choosing positions
 ylabel =  'z' if np.isclose(d['y'].max(),d['y'].min()) else 'y';
 if opts['--x-restrict']:
@@ -161,17 +162,6 @@ if opts['--x-restrict']:
 elif opts['--restrict']:
     res = parse_ituple(opts['--restrict'],length=None);
     restrict(d,res);
-####################################
-#massaging data
-t  = d['t'];
-x,y = d['x']*1e4,d[ylabel]*1e4
-q = read(d);
-
-if opts['--blur']:
-    rad = float(opts['--blur']);
-    w=rad*6;
-    q,x,y = smooth2Dp(
-        q, (x,y), [0.1,0.1], [0.6,0.6]);
 
 #trajectories
 if opts['--traj']:
@@ -210,7 +200,10 @@ if opts['--traj']:
             #magic, think about it
             sz = len(keys[0] if keys[0] != 'time' else keys[1])
             fmt ='{{:0{}}}'.format(sz);
-            if pn_end is None: pn_end = ps;
+            if pn_end is None:
+                pn_end = ps;
+            else:
+                pn_end = min(ps,pn_end);
             tr = np.array([
                 f[fmt.format(i)][tri_start:tri+1] for i in range(pn_start,pn_end,pn_step) ]).T
     if opts['--verbose']:
@@ -219,6 +212,16 @@ if opts['--traj']:
         print("with sclr time as {}".format(t));
     pass;
 
+####################################
+#massaging data
+x,y = d['x']*1e4,d[ylabel]*1e4
+q = read(d);
+
+if opts['--blur']:
+    rad = float(opts['--blur']);
+    w=rad*6;
+    q,x,y = smooth2Dp(
+        q, (x,y), [0.1,0.1], [0.6,0.6]);
     
 #####################################
 #plotting

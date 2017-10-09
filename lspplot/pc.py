@@ -216,7 +216,7 @@ def trajectories(ret,trajs,**kw):
     def nonnan(x):
         if x is not None:
             x = x.ravel();
-            return x[np.isfinite(x))];
+            return x[np.isfinite(x)];
     if test(kw,'color_quantity'):
         cf = getkw('color_quantity');
         if type(cf) == str:

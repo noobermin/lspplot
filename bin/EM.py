@@ -195,7 +195,7 @@ if opts['--traj']:
             else:
                 pn_start,pn_end,pn_step=parse_ituple(opts['--traj-n'],length=3);
         if not opts['--traj-newfmt']:
-            tr = f['data'][tri_start:tri+1, pn_start:pn_end:pn_step];
+            tr = f['data'][:, pn_start:pn_end:pn_step];
         else:
             keys = list(f.keys());
             ps = len(keys) - 1;
@@ -208,6 +208,9 @@ if opts['--traj']:
                 pn_end = min(ps,pn_end);
             tr = np.array([
                 f[fmt.format(i)][tri_start:tri+1] for i in range(pn_start,pn_end,pn_step) ]).T
+        #needs to be here before nans occur.
+        maxq=np.max(np.abs(tr['q'])[0,:]);
+        tr = tr[tri_start:tri+1,:];
     if opts['--verbose']:
         print("size of trajectories: {}".format(tr.shape));
         print("final time is {}".format(trt));
@@ -303,7 +306,6 @@ if opts['--traj']:
     else:
         cf = None;
     #massaging alpha
-    maxq=np.max(np.abs(tr['q'])[0,:]);
     if opts['--traj-qinvpow']:
         p = 1.0/float(opts['--traj-qinvpow']);
         alphaf = lambda itr: (np.abs(itr['q'])[0]/maxq)**p

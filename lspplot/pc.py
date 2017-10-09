@@ -227,15 +227,15 @@ def trajectories(ret,trajs,**kw):
             marker=getkw('marker'),
             lw=getkw('lw'),
             s=getkw('size'),
-            alpha=nonnan(af(itr)),
+            #this is disabled pending further study
+            #alpha=nonnan(af(itr)),
             cmap=getkw('cmap'));
     else:
-        plotit = lambda itr: ret['axes'].scatter(
+        #this must be plot for just alpha
+        plotit = lambda itr: ret['axes'].plot(
             nonnan(itr[xl])*xs, nonnan(itr[yl])*ys,
-            marker=getkw('marker'),
             lw=getkw('lw'),
-            s=getkw('size'),
-            alpha=nonnan(af(itr)),
+            alpha=af(itr),
             c=getkw('color'),);
         pass;
     if test(kw, 'simple'):

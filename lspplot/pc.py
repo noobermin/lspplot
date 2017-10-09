@@ -216,6 +216,7 @@ def trajectories(ret,trajs,**kw):
     if not test(kw,"color_quantity"):
         plotit = lambda itr: ret['axes'].scatter(
             itr[xl].ravel()*xs, itr[yl].ravel()*ys,
+            marker=getkw('marker'),
             lw=getkw('lw'),
             s=getkw('size'),
             alpha=af(itr),
@@ -228,6 +229,7 @@ def trajectories(ret,trajs,**kw):
         plotit = lambda itr: ret['axes'].scatter(
             itr[xl].ravel()*xs, itr[yl].ravel()*ys,
             c=cf(itr),
+            marker=getkw('marker'),
             lw=getkw('lw'),
             s=getkw('size'),
             alpha=af(itr),

@@ -309,11 +309,12 @@ if opts['--traj']:
     else:
         cf = None;
     #massaging alpha
+    qread = lambda itr: np.abs(np.nan_to_num(itr['q'][0]));
     if opts['--traj-qinvpow']:
         p = 1.0/float(opts['--traj-qinvpow']);
-        alphaf = lambda itr: (np.abs(itr['q'])[0]/maxq)**p
+        alphaf = lambda itr: (qread(itr)/maxq)**p
     else:
-        alphaf = lambda itr: np.abs(itr['q'])[0]/maxq
+        alphaf = lambda itr: qread(itr)/maxq
     trajectories(
         r, tr,
         alpha=alphaf,

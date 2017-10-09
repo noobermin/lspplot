@@ -283,9 +283,8 @@ if opts['--target']:
 gm = lambda itr: np.sqrt(itr['ux']**2+itr['uy']**2+itr['uz']**2+1);
 massE = float(opts['--traj-mass']);
 if opts['--traj']:
-    tr[ylabel]*=1e4;
-    tr['x']*=1e4;
     if opts['--traj-energy']:
+        print("warning: this doesn't work with alpha settings...");
         en = lambda itr:np.nan_to_num(massE*(gm(itr)-1));
         if opts['--traj-E-log']:
             minE = float(opts['--traj-minE']);
@@ -306,24 +305,24 @@ if opts['--traj']:
         else:
             maxE=np.max(energy(tr));
             cf = lambda itr: energy(itr)/maxE;
+        alphaf=None;
+        cmap='copper';
     else:
         cf = None;
-    #massaging alpha
-    qread = lambda itr: np.abs(np.nan_to_num(itr['q'][0]));
-    if opts['--traj-qinvpow']:
-        p = 1.0/float(opts['--traj-qinvpow']);
-        alphaf = lambda itr: (qread(itr)/maxq)**p
-    else:
-        alphaf = lambda itr: qread(itr)/maxq
+        qread = lambda itr: np.abs(np.nan_to_num(itr['q'][0]));
+        if opts['--traj-qinvpow']:
+            alphaf = lambda itr: (qread(itr)/maxq)**p
+        else:
+            alphaf = lambda itr: qread(itr)/maxq
+        cmap=None
     trajectories(
         r, tr,
         alpha=alphaf,
-        lw=0,
+        lw=1,
         coords = [ylabel,'x'],
-        cmap   = 'copper',
-        #simple = True,
+        cmap   = cmap,
+        scale  = [1e4,1e4],
         color_quantity=cf);
-
 
 import matplotlib.pyplot as plt;
 if opts['--equal']:

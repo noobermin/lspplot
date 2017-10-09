@@ -213,13 +213,16 @@ def trajectories(ret,trajs,**kw):
         af = lambda itr: None;
     elif type(alpha) == float:
         af = lambda itr: alpha;
+    def nonnan(x):
+        x = x.ravel();
+        return x[np.logical_not(np.isnan(x))];
     if not test(kw,"color_quantity"):
         plotit = lambda itr: ret['axes'].scatter(
-            itr[xl].ravel()*xs, itr[yl].ravel()*ys,
+            nonnan(itr[xl])*xs, nonnan(itr[yl])*ys,
             marker=getkw('marker'),
             lw=getkw('lw'),
             s=getkw('size'),
-            alpha=af(itr),
+            alpha=nonnan(af(itr)),
             c=getkw('color'),);
         pass;
     else:
@@ -227,12 +230,12 @@ def trajectories(ret,trajs,**kw):
         if type(cf) == str:
             cf = lambda itr: itr[cf];
         plotit = lambda itr: ret['axes'].scatter(
-            itr[xl].ravel()*xs, itr[yl].ravel()*ys,
-            c=cf(itr),
+            nonnan(itr[xl])*xs, nonnan(itr[yl])*ys,
+            c=nonnan(cf(itr)),
             marker=getkw('marker'),
             lw=getkw('lw'),
             s=getkw('size'),
-            alpha=af(itr),
+            alpha=nonnan(af(itr)),
             cmap=getkw('cmap'));
     if test(kw, 'simple'):
         plotit(trajs);

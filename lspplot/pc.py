@@ -214,18 +214,10 @@ def trajectories(ret,trajs,**kw):
     elif type(alpha) == float:
         af = lambda itr: alpha;
     def nonnan(x):
-        x = x.ravel();
-        return x[np.logical_not(np.isnan(x))];
-    if not test(kw,"color_quantity"):
-        plotit = lambda itr: ret['axes'].scatter(
-            nonnan(itr[xl])*xs, nonnan(itr[yl])*ys,
-            marker=getkw('marker'),
-            lw=getkw('lw'),
-            s=getkw('size'),
-            alpha=nonnan(af(itr)),
-            c=getkw('color'),);
-        pass;
-    else:
+        if x is not None:
+            x = x.ravel();
+            return x[np.isfinite(x))];
+    if test(kw,'color_quantity'):
         cf = getkw('color_quantity');
         if type(cf) == str:
             cf = lambda itr: itr[cf];
@@ -237,10 +229,20 @@ def trajectories(ret,trajs,**kw):
             s=getkw('size'),
             alpha=nonnan(af(itr)),
             cmap=getkw('cmap'));
+    else:
+        plotit = lambda itr: ret['axes'].scatter(
+            nonnan(itr[xl])*xs, nonnan(itr[yl])*ys,
+            marker=getkw('marker'),
+            lw=getkw('lw'),
+            s=getkw('size'),
+            alpha=nonnan(af(itr)),
+            c=getkw('color'),);
+        pass;
     if test(kw, 'simple'):
         plotit(trajs);
     else:
         for itr in np.rollaxis(trajs,1):
+            if np.isfinite(itr['q']).max() is False: continue;
             plotit(itr);
     if not test(kw, "no_resize"):
         ret['axes'].set_xlim(xlim);

@@ -311,6 +311,7 @@ if opts['--traj']:
         cf = None;
         qread = lambda itr: np.abs(np.nan_to_num(itr['q'][0]));
         if opts['--traj-qinvpow']:
+            p=float(opts['--traj-qinvpow']);
             alphaf = lambda itr: (qread(itr)/maxq)**p
         else:
             alphaf = lambda itr: qread(itr)/maxq

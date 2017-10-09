@@ -207,7 +207,8 @@ if opts['--traj']:
             else:
                 pn_end = min(ps,pn_end);
             tr = np.array([
-                f[fmt.format(i)][tri_start:tri+1] for i in range(pn_start,pn_end,pn_step) ]).T
+                f[fmt.format(i)]
+                for i in range(pn_start,pn_end,pn_step) ]).T
         #needs to be here before nans occur.
         maxq=np.max(np.abs(tr['q'])[0,:]);
         

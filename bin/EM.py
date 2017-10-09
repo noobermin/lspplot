@@ -210,11 +210,13 @@ if opts['--traj']:
                 f[fmt.format(i)][tri_start:tri+1] for i in range(pn_start,pn_end,pn_step) ]).T
         #needs to be here before nans occur.
         maxq=np.max(np.abs(tr['q'])[0,:]);
+        
         tr = tr[tri_start:tri+1,:];
     if opts['--verbose']:
         print("size of trajectories: {}".format(tr.shape));
         print("final time is {}".format(trt));
         print("with sclr time as {}".format(t));
+        print("maxq is {}".format(maxq));
     pass;
 
 ####################################

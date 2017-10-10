@@ -201,7 +201,7 @@ def trajectories(ret,trajs,**kw):
     Returns:
       None.
     '''
-
+    import matplotlib.pyplot as plt;
     getkw=mk_getkw(kw, trajdefaults);
     xl,yl = getkw("coords");
     xs,ys = getkw("scale");
@@ -221,28 +221,38 @@ def trajectories(ret,trajs,**kw):
         cf = getkw('color_quantity');
         if type(cf) == str:
             cf = lambda itr: itr[cf];
-        plotit = lambda itr: ret['axes'].scatter(
-            nonnan(itr[xl])*xs, nonnan(itr[yl])*ys,
-            c=nonnan(cf(itr)),
-            marker=getkw('marker'),
-            lw=getkw('lw'),
-            s=getkw('size'),
-            #this is disabled pending further study
-            #alpha=nonnan(af(itr)),
-            cmap=getkw('cmap'));
+        def _plotit(itr):
+            x=nonnan(itr[xl])*xs;
+            y=nonnan(itr[yl])*ys;
+            x, y=x[s], y[s]; 
+            ret['axes'].scatter(
+                x, y,
+                c=nonnan(cf(itr)),
+                marker=getkw('marker'),
+                lw=getkw('lw'),
+                s=getkw('size'),
+                #this is disabled pending further study
+                #alpha=nonnan(af(itr)),
+                cmap=getkw('cmap'));
+        plotit = _plotit;
     else:
         #this must be plot for just alpha
-        plotit = lambda itr: ret['axes'].plot(
-            nonnan(itr[xl])*xs, nonnan(itr[yl])*ys,
-            lw=getkw('lw'),
-            alpha=af(itr),
-            c=getkw('color'),);
-        pass;
+        def _plotit(itr):
+            x=nonnan(itr[xl])*xs;
+            y=nonnan(itr[yl])*ys;
+            ret['axes'].plot(
+                x, y,
+                lw=getkw('lw'),
+                alpha=af(itr),
+                c=getkw('color'),);
+        plotit = _plotit;
     if test(kw, 'simple'):
         plotit(trajs);
     else:
-        for itr in np.rollaxis(trajs,1):
-            if np.isfinite(itr['q']).max() is False: continue;
+        for itr in trajs:
+            if np.any(np.isnan(itr[xl])):
+                print("skipping nan");
+                continue;
             plotit(itr);
     if not test(kw, "no_resize"):
         ret['axes'].set_xlim(xlim);

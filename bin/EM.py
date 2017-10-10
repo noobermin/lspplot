@@ -195,7 +195,7 @@ if opts['--traj']:
             else:
                 pn_start,pn_end,pn_step=parse_ituple(opts['--traj-n'],length=3);
         if not opts['--traj-newfmt']:
-            tr = f['data'][:, pn_start:pn_end:pn_step];
+            tr = f['data'][:,pn_start:pn_end:pn_step].T;
         else:
             keys = list(f.keys());
             ps = len(keys) - 1;
@@ -208,11 +208,11 @@ if opts['--traj']:
                 pn_end = min(ps,pn_end);
             tr = np.array([
                 f[fmt.format(i)]
-                for i in range(pn_start,pn_end,pn_step) ]).T
+                for i in range(pn_start,pn_end,pn_step)])
         #needs to be here before nans occur.
-        maxq=np.max(np.abs(tr['q'])[0,:]);
+        maxq=np.max(np.abs(tr['q'])[:,0]);
         
-        tr = tr[tri_start:tri+1,:];
+        tr = tr[:,tri_start:tri+1];
     if opts['--verbose']:
         print("size of trajectories: {}".format(tr.shape));
         print("final time is {}".format(trt));
@@ -322,7 +322,7 @@ if opts['--traj']:
         lw=1,
         coords = [ylabel,'x'],
         cmap   = cmap,
-        scale  = [1e4,1e4],
+        scale  = (1e4,1e4),
         color_quantity=cf);
 
 import matplotlib.pyplot as plt;

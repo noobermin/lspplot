@@ -78,7 +78,7 @@ def pc(q,p=None,**kw):
     else:
         mn, mx = None, None
     if test(kw,'log'):
-        if mn<0 or test(kw,"force_symlog"):
+        if mn is not None and (mn<0 or test(kw,"force_symlog"));
             linthresh = getkw('linthresh');
             norm = SymLogNorm(
                 linthresh=linthresh,

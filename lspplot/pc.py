@@ -20,6 +20,7 @@ pc_defaults = dict(
     linthresh=1.0,
     linscale=1.0,
     orient='vertical',
+    flip=False,
 )
 
 
@@ -54,6 +55,8 @@ def pc(q,p=None,**kw):
       clabel -- set colorbar label
       orient -- the orientation for the colorbar.
       cmap   -- set the colormap.
+      flip   -- flip x and y instead of rotate, mimics behavior before
+                version 0.0.12.
 
     Returns:
       A dictionary with axes, pcolormesh object,
@@ -92,12 +95,16 @@ def pc(q,p=None,**kw):
     if p == None:
         p = np.arange(q.shape[0]), np.arange(q.shape[1]);
     x,y=p;
+    if test(kw, 'flip'):
+        x,y =  y,x;
+    else:
+        x,y = -y,x;
     if len(x.shape)==len(y.shape) and len(y.shape)==1:
-        y,x = np.meshgrid(y,x,indexing='ij');
+        x,y = np.meshgrid(x,y,indexing='ij');
     ret['q'] = q;
     ret['x'],ret['y'] = x,y;
     mypc = ret['pc'] =ax.pcolormesh(
-        y,x,q,vmin=mn,vmax=mx,cmap=getkw('cmap'),norm=norm);
+        x,y,q,vmin=mn,vmax=mx,cmap=getkw('cmap'),norm=norm);
     if 'cbar' in kw and kw['cbar'] is False:
         ret['cbar'] = cbar = None;
     else:
@@ -153,7 +160,7 @@ def highlight(ret, val,
     cbar = ret['cbar'];
     if not test(ret, 'cts'):
         ret['cts'] = [];
-    ct = ax.contour(ret['y'],ret['x'], q, [val],
+    ct = ax.contour(ret['x'],ret['y'], q, [val],
                     colors=[color], alpha = alpha);
     ret['cts'].append(ct);
     if q is ret['q']:
@@ -162,7 +169,7 @@ def highlight(ret, val,
 
 trajdefaults = dict(
     alpha = None,
-    coords= ['y','x'],
+    coords= ['x','y'],
     color = 'black',
     no_resize=False,
     cmap=None,
@@ -198,6 +205,8 @@ def trajectories(ret,trajs,**kw):
                        itr is a row in trajs. If none, just plot a line.
       scale     -- scale the coordinates.
       simple    -- simple scatter.
+      flip      -- flip instead of rotate. Mimics behavior before version
+                   0.0.12.
     Returns:
       None.
     '''
@@ -205,6 +214,12 @@ def trajectories(ret,trajs,**kw):
     getkw=mk_getkw(kw, trajdefaults);
     xl,yl = getkw("coords");
     xs,ys = getkw("scale");
+    if test(kw,'flip'):
+        xl,yl = yl,xl; # yes, unneeded, but clearer.
+        xs,ys = ys,xs;
+    else:
+        xl,yl = yl,xl;
+        xs,ys =-ys,xs;
     if not test(kw, "no_resize"):
         xlim, ylim = ret['axes'].get_xlim(), ret['axes'].get_ylim();
     alpha = getkw('alpha');

@@ -20,7 +20,6 @@ pc_defaults = dict(
     linthresh=1.0,
     linscale=1.0,
     orient='vertical',
-    flip=False,
 )
 
 

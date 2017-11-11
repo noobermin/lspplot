@@ -21,11 +21,13 @@ Options:
   --high-res -H               Output a high resolution plot.
   --max-q=MAXQ -q MAXQ        Set the maximum for the charge (pcolormesh's vmax value).
   --min-q=MINQ                Set a minimum charge.
-  --angle-range=A -R A        Only plot this range of angles, does not change binning which is still
-                              -pi to pi. Pass the values as fractions of pi. Example, -A (-0.5,0).
+  --angle-range=A -R A        Only plot this range of angles, does not change binning which is 
+                              still -pi to pi. Pass the values as fractions of pi.
+                              Example, (-0.5,0).
   --normalize -n              Normalize the histogram to MeV^-1 rad^-1 .
   --factor=F -f F             Multiply histogram by F. [default: 1.0]
-  --polar -p                  Plot polar angles for 3D data, letting the east direction be forward.
+  --polar -p                  Plot polar angles for 3D data, letting the east direction be
+                              forward.
   --oap=ANGLE -o ANGLE        Set the width angle of the OAP. [default: 50.47]
   --massE=E                   Set the mass of the particles for efficiency in eV. [default: 0.511e6]
   --log10 -l                  Plot a logarithmic pcolor instead of a linear one.

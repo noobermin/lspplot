@@ -93,13 +93,10 @@ def pc(q,p=None,**kw):
         norm= None;
     if p == None:
         p = np.arange(q.shape[0]), np.arange(q.shape[1]);
-    x,y=p;
-    if test(kw, 'flip'):
-        x,y =  y,x;
-    else:
-        x,y = -y,x;
-    if len(x.shape)==len(y.shape) and len(y.shape)==1:
-        x,y = np.meshgrid(x,y,indexing='ij');
+    y,x=p;
+    if not test(kw, 'flip'):
+        y = y[::-1]
+        q = q[::-1,:];
     ret['q'] = q;
     ret['x'],ret['y'] = x,y;
     mypc = ret['pc'] =ax.pcolormesh(

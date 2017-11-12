@@ -89,7 +89,12 @@ def pc(q,p=None,**kw):
                 vmin=mn,vmax=mx);
         else:
             norm= LogNorm();
-            q  += 1;
+            if len(q[ q > 0.0 ]) == 0:
+                raise ValueError("quantity has no values greater than zero with log");
+            floor = q[ q > 0.0 ].min();
+            if mn is not None:
+                floor = min(mn,floor);
+            q[q <= 0.0] = floor;
     else:
         norm= None;
     if p == None:

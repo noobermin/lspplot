@@ -34,6 +34,7 @@ Options:
     --linscale=L       Set the linear threshold for SymLogPlot [default: 1e7]
     --cmap=CMAP        Set the colormap. [default: viridis]
     --equal -E         Make spatial dimensions equal.
+    --rotate -R        Rotate instead of flipping x and y (ie., flip x axis).
     --blur=R           Blur with this radius.
     --t-offset=T       Set time offset in fs. [default: 0].
     --traj=F           Plot trajectories from this file. If not used,
@@ -236,7 +237,10 @@ if opts['--blur']:
 
 #getting options from user
 mn,mx = parse_ftuple(opts['--lims'],length=2);
-
+if opts['--rotate']:
+    rot,flip = True, False;
+else:
+    rot,flip = False, True;
 #plot the density
 toff=float(opts['--t-offset']);
 title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6+toff);
@@ -246,7 +250,8 @@ r=pc(
     agg=not opts['--show'],
     linthresh=float(opts['--linthresh']),
     linscale=float(opts['--linscale']),
-    flip=True,
+    flip=flip,
+    rotate=rot,
     cmap=opts['--cmap'],);
 
 if opts['--highlight']:

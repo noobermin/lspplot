@@ -26,6 +26,7 @@ Options:
     --intensity=I -I I  Make a contour of this intensity [default: 3e18]
     --linthresh=L       Set the linear threshold for SymLogPlot [default: 1.0]
     --linscale=L        Set the linear threshold for SymLogPlot [default: 1.0]
+    --rotate -R         Rotate instead of flipping x and y (ie., flip x axis).
     --cmap=CMAP         Set the colormap. [default: viridis]
 
 '''
@@ -81,6 +82,10 @@ rho = ( np.gradient(Ex,dx,axis=0) + np.gradient(Ey,dy,axis=1) ) * e0 / e * 1e-4;
 
 #getting options from user
 mn,mx = parse_ftuple(opts['--lims'],length=2);
+if opts['--rotate']:
+    rot,flip = True, False;
+else:
+    rot,flip = False, True;
 
 
 #plot the density
@@ -92,7 +97,8 @@ r=pc(
     agg=not opts['--show'],
     linthresh=float(opts['--linthresh']),
     linscale=float(opts['--linscale']),
-    flip=True,
+    rotate=rot,
+    flip=flip,
     cmap=opts['--cmap'],);
 
 

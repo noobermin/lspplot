@@ -100,6 +100,8 @@ def pc(q,p=None,**kw):
         x=x.T;
         y=y.T;
         q=q.T;
+    ret['flip'] = test(kw, 'flip');
+    ret['rotate'] = test(kw, 'rotate');
     ret['q'] = q;
     ret['x'],ret['y'] = x,y;
     mypc = ret['pc'] =ax.pcolormesh(
@@ -156,6 +158,12 @@ def highlight(ret, val,
     ax = ret['axes'];
     if q is None:
         q = ret['q'];
+    
+    if q.shape != ret['x'].shape and test(ret,'flip'):
+        if q.T.shape == ret['x'].shape:
+            q=q.T
+        else:
+            print("warning: q.T doesn't match x but we should flip?");
     if not test(ret, 'cbar'):
         ret['cbar'] = plt.colorbar(ret['pc']);
     cbar = ret['cbar'];
@@ -215,7 +223,7 @@ def trajectories(ret,trajs,**kw):
     getkw=mk_getkw(kw, trajdefaults);
     xl,yl = getkw("coords");
     xs,ys = getkw("scale");
-    if test(kw,'flip'):
+    if test(kw,'flip') or test(ret,'flip'):
         xl,yl = yl,xl; # yes, unneeded, but clearer.
         xs,ys = ys,xs;
     else:

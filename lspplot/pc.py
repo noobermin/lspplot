@@ -54,7 +54,8 @@ def pc(q,p=None,**kw):
       clabel -- set colorbar label
       orient -- the orientation for the colorbar.
       cmap   -- set the colormap.
-      flip   -- flip x and y instead of rotate, mimics behavior before
+      rotate -- rotate x and y.
+      flip   -- flips x and y. mimics behavior before
                 version 0.0.12.
 
     Returns:
@@ -93,14 +94,16 @@ def pc(q,p=None,**kw):
         norm= None;
     if p == None:
         p = np.arange(q.shape[0]), np.arange(q.shape[1]);
-    y,x=p;
-    if not test(kw, 'flip'):
-        y = y[::-1]
-        q = q[::-1,:];
+    x,y=p;
+    if test(kw, 'flip') or test kw('rotate'):
+        x,y=y,x;
+        q=q.T;
     ret['q'] = q;
     ret['x'],ret['y'] = x,y;
     mypc = ret['pc'] =ax.pcolormesh(
         x,y,q,vmin=mn,vmax=mx,cmap=getkw('cmap'),norm=norm);
+    if test(kw, 'rotate'):
+        ret['axes'].invert_xaxis()
     if 'cbar' in kw and kw['cbar'] is False:
         ret['cbar'] = cbar = None;
     else:

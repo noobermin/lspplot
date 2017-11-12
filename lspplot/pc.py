@@ -97,6 +97,8 @@ def pc(q,p=None,**kw):
     x,y=p;
     if test(kw, 'flip') or test(kw,'rotate'):
         x,y=y,x;
+        x=x.T;
+        y=y.T;
         q=q.T;
     ret['q'] = q;
     ret['x'],ret['y'] = x,y;

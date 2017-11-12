@@ -102,6 +102,7 @@ r=pc(
     q,(x,y), lims=(mn,mx),log=opts['--log10'],
     clabel=units, title=title,
     agg=not opts['--show'],
+    flip=True,
     orient=orient,);
 
 if opts['--highlight'] and opts['--highlight'] != "None" and opts['--highlight'] != 'none':

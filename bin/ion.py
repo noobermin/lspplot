@@ -126,6 +126,7 @@ r=pc(
     agg=not opts['--show'],
     linthresh=float(opts['--linthresh']),
     linscale=float(opts['--linscale']),
+    flip=True,
     cmap=opts['--cmap'],
 );
 

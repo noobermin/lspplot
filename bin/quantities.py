@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 '''
 Output the efficiency of a sim from a pext.py output.
 All units are SI.

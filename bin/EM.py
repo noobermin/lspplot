@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''
 Just render EM something.
@@ -67,7 +67,7 @@ from pys import fltrx_s, srx_s, rgbrx_s, quote_subs
 from lspreader.flds import read_indexed, restrict
 from lspplot.sclr import S, E_energy,B_energy,EM_energy, vector_norm, smooth2Dp;
 from lspplot.pc import pc, highlight, trajectories;
-from lspplot.consts import c,mu0,e0;
+from lspplot.physics import c,mu0,e0;
 import re;
 
 opts = docopt(__doc__,help=True);

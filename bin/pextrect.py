@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 '''
 Plot a charge vs. two other components, x and y of a pext.py output.
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''
 Just render something.
@@ -37,7 +37,7 @@ from pys import parse_ftuple, parse_ituple;
 from lspreader.flds import read_indexed, restrict
 from lspplot.sclr import S;
 from lspplot.pc import pc,highlight;
-from lspplot.consts import c,mu0,e0;
+from lspplot.physics import c,mu0,e0;
 
 opts = docopt(__doc__,help=True);
 

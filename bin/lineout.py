@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 '''
 Usage:
     lineout.py [options] <i> [<output>]

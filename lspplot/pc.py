@@ -9,7 +9,7 @@ from lspreader.lspreader import get_header;
 import numpy as np;
 import numpy.linalg as lin;
 from pys import parse_ftuple,test,takef,mk_getkw;
-from lspplot.consts import *
+from lspplot.physics import c,e0,mu0;
 
 pc_defaults = dict(
     xlabel='microns',

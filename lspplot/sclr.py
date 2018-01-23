@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 '''
 For plotting sclr/flds files.
 '''
@@ -9,7 +9,7 @@ from scipy.signal import convolve;
 import numpy as np;
 import numpy.linalg as lin;
 from pys import parse_ftuple,test,takef;
-from consts import *
+from lspplot.physics import c,e0,mu0;
 
 def getvector(d,s):
     return np.array([d[s+"x"],d[s+"y"],d[s+"z"]]);

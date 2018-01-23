@@ -1,11 +1,7 @@
-
 ##########################################################
 #
-# colormap stuff
-#
-# section this off later.
-
 # colormaps. It's CC0, but I include attribution because I'm not a little bitch.
+# For an original version see the file "untouched_colomaps.py" or google, lol
 
 # New matplotlib colormaps by Nathaniel J. Smith, Stefan van der Walt,
 # and (in the case of viridis) Eric Firing.
@@ -15,7 +11,8 @@
 # The colormaps and related subroutines in this file
 # are released under the CC0 license / public domain dedication.
 # We would appreciate credit if you use or redistribute these colormaps, but do
-# not impose any legal restrictions.
+# not impose any legal restrictions. This license does not extend to the rest of
+# the code of course.
 #
 # To the extent possible under law, the persons who associated CC0 with
 # mpl-colormaps have waived all copyright and related or neighboring rights
@@ -1055,14 +1052,12 @@ _viridis_data = [[0.267004, 0.004874, 0.329415],
 import matplotlib.colors as colors;
 ListedColormap = colors.ListedColormap;
 
-cmaps = {}
-for (name, data) in (('magma', _magma_data),
-                     ('inferno', _inferno_data),
-                     ('plasma', _plasma_data),
-                     ('viridis', _viridis_data)):
-
-    cmaps[name] = ListedColormap(data, name=name)
-
+cmaps={
+    name: ListedColormap(data, name=name)
+    for data,name in zip(
+            [_magma_data,_inferno_data,_plasma_data],
+            ['magma','inferno','plasma','viridis'])
+};
 magma = cmaps['magma']
 inferno = cmaps['inferno']
 plasma = cmaps['plasma']

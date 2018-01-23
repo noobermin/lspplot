@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='lspplot',
-      version='0.0.13',
+      version='0.1.0rc1',
       description='lsp plots',
       url='http://github.com/noobermin/lspplot',
       author='noobermin',

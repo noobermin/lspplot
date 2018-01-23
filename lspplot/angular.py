@@ -8,9 +8,9 @@ import matplotlib.patheffects as pe;
 from lspreader.dotlsp import getdim;
 from matplotlib import colors;
 from pys import test,mk_getkw,parse_ftuple,sd;
-from cmaps import pastel_clear,plasma_clear,viridis_clear,magma_clear_r;
+from lspplot.cmaps import pastel_clear,plasma_clear,viridis_clear,magma_clear_r;
 import re;
-from physics import laserE, a0;
+from lspplot.physics import laserE, a0;
 
 def _getlsp(path=None):
     if not path:

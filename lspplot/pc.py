@@ -176,7 +176,7 @@ def highlight(ret, val,
     cbar = ret['cbar'];
     if not test(ret, 'cts'):
         ret['cts'] = [];
-    ct = ax.contour(ret['x'],ret['y'], q, [val],
+    ct = ax.contour(x,y,q, [val],
                     colors=[color], alpha = alpha);
     ret['cts'].append(ct);
     if q is ret['q']:

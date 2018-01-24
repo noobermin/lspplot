@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 '''
 For plotting sclr/flds files.
 '''
@@ -146,24 +146,26 @@ def highlight(ret, val,
               q=None, color='white', alpha=0.15, erase=False):
     '''
     Highlight a pc. Essentially a wrapper of plt.contour
-
+    
     Arguments:
       ret   -- dict returned from pc.
       val   -- value to highlight
       q     -- quantity to highlight. If None, highlight ret's quantity
-
+    
     Keyword Arguments:
       color -- color of highlight
       alpha -- alpha of highlight
       erase -- erases the highlights. Defaults to false (opposite of matplotlib!)
-
+    
     Returns:
       ret but with stuff that plt.contour adds.
     '''
     ax = ret['axes'];
     if q is None:
         q = ret['q'];
-    
+    x,y=ret['x'],ret['y'];
+    if test(ret,'flip'):
+        y,x=x,y;
     if q.shape != ret['x'].shape and test(ret,'flip'):
         if q.T.shape == ret['x'].shape:
             q=q.T

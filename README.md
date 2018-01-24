@@ -7,7 +7,7 @@ Prerequisites
 -------------
 * `numpy>=1.10.1`
 * `scipy>=0.16.0`
-* `lspreader>=0.1.0`
+* `lspreader>=0.1.7`
 * `pys>=0.0.4`
 
 Install

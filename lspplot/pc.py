@@ -164,7 +164,7 @@ def highlight(ret, val,
     if q is None:
         q = ret['q'];
     x,y=ret['x'],ret['y'];
-    if q.shape != ret['x'].shape and test(ret,'flip'):
+    if q is not ret['q'] and test(ret,'flip'):
         if q.T.shape == ret['x'].shape:
             q=q.T
         else:

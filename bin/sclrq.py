@@ -26,7 +26,8 @@ Options:
     --laser             Plot contours of the laser poyting vector.
     --intensity=I -I I  Make a contour of this intensity [default: 3e18]
     --equal -E          Make spatial dimensions equal.
-    --rotate -R         Rotate instead of flipping x and y (ie., flip x axis).
+    --flip -F           Flip instead rotate (ie., flip x axis) as in older
+                        versions.
     --no-ticks          Don't include ticks.
     --orientation=V     "V" for vertical or "H" for horizontal [default: V]
 '''
@@ -83,10 +84,10 @@ q = d[quantity];
 
 #getting options from user
 mn,mx = parse_ftuple(opts['--lims'],length=2);
-if opts['--rotate']:
-    rot,flip = True, False;
-else:
+if opts['--flip']:
     rot,flip = False, True;
+else:
+    rot,flip = True, False;
 
 
 #plot the density
@@ -119,6 +120,7 @@ if opts['--highlight'] and opts['--highlight'] != "None" and opts['--highlight']
 
 if opts['--laser']:
     laser = S(d);
+    print(laser.shape);
     I = float(opts['--intensity']);
     highlight(r, I, q=laser,
               color="red", alpha=0.15);

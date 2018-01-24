@@ -34,7 +34,8 @@ Options:
     --linscale=L        Set the linear threshold for SymLogPlot [default: 1.0]
     --cmap=CMAP         Set the colormap. [default: viridis]
     --equal -E          Make spatial dimensions equal.
-    --rotate -R        Rotate instead of flipping x and y (ie., flip x axis).
+    --flip -F           Flip instead rotate (ie., flip x axis) as in older
+                        versions.
     --no-ticks          Don't include ticks.
 '''
 from docopt import docopt;
@@ -117,10 +118,10 @@ q = np.average(acc,axis=0);
 
 #getting options from user
 mn,mx = parse_ftuple(opts['--lims'],length=2);
-if opts['--rotate']:
-    rot,flip = True, False;
-else:
+if opts['--flip']:
     rot,flip = False, True;
+else:
+    rot,flip = True, False;
 #plot the density
 toff = float("--t-offset");
 title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6+toff);

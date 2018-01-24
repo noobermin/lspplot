@@ -100,6 +100,7 @@ def pc(q,p=None,**kw):
     if p == None:
         p = np.arange(q.shape[0]), np.arange(q.shape[1]);
     x,y=p;
+    ret['x'],ret['y'] = p;
     if test(kw, 'flip') or test(kw,'rotate'):
         x,y=y,x;
         x=x.T;
@@ -108,11 +109,10 @@ def pc(q,p=None,**kw):
     ret['flip'] = test(kw, 'flip') or test(kw,'rotate');
     ret['rotate'] = test(kw, 'rotate');
     ret['q'] = q;
-    ret['x'],ret['y'] = x,y;
     mypc = ret['pc'] =ax.pcolormesh(
         x,y,q,vmin=mn,vmax=mx,cmap=getkw('cmap'),norm=norm);
     if test(kw, 'rotate'):
-        ret['axes'].invert_xaxis()
+        ret['axes'].invert_xaxis();
     if 'cbar' in kw and kw['cbar'] is False:
         ret['cbar'] = cbar = None;
     else:
@@ -164,13 +164,11 @@ def highlight(ret, val,
     if q is None:
         q = ret['q'];
     x,y=ret['x'],ret['y'];
-    if test(ret,'flip'):
-        y,x=x,y;
-    if q.shape != ret['x'].shape and test(ret,'flip'):
-        if q.T.shape == ret['x'].shape:
-            q=q.T
-        else:
-            print("warning: q.T doesn't match x but we should flip?");
+    #if q.shape != ret['x'].shape and test(ret,'flip'):
+    #    if q.T.shape == ret['x'].shape:
+    #        q=q.T
+    #    else:
+    #        print("warning: q.T doesn't match x but we should flip?");
     if not test(ret, 'cbar'):
         ret['cbar'] = plt.colorbar(ret['pc']);
     cbar = ret['cbar'];

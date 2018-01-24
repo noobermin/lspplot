@@ -103,9 +103,9 @@ def pc(q,p=None,**kw):
     ret['x'],ret['y'] = p;
     if test(kw, 'flip') or test(kw,'rotate'):
         x,y=y,x;
-        #x=x.T;
-        #y=y.T;
-        #q=q.T;
+        x=x.T;
+        y=y.T;
+        q=q.T;
     ret['flip'] = test(kw, 'flip') or test(kw,'rotate');
     ret['rotate'] = test(kw, 'rotate');
     ret['q'] = q;
@@ -164,11 +164,11 @@ def highlight(ret, val,
     if q is None:
         q = ret['q'];
     x,y=ret['x'],ret['y'];
-    #if q.shape != ret['x'].shape and test(ret,'flip'):
-    #    if q.T.shape == ret['x'].shape:
-    #        q=q.T
-    #    else:
-    #        print("warning: q.T doesn't match x but we should flip?");
+    if q.shape != ret['x'].shape and test(ret,'flip'):
+        if q.T.shape == ret['x'].shape:
+            q=q.T
+        else:
+            print("warning: q.T doesn't match x but we should flip?");
     if not test(ret, 'cbar'):
         ret['cbar'] = plt.colorbar(ret['pc']);
     cbar = ret['cbar'];

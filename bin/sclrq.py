@@ -26,6 +26,8 @@ Options:
     --laser             Plot contours of the laser poyting vector.
     --intensity=I -I I  Make a contour of this intensity [default: 3e18]
     --equal -E          Make spatial dimensions equal.
+    --cmap=CMAP         Set the colormap. [default: viridis]
+    --nofloor           Raise an error if there are no positive values for log.
     --flip -F           Flip instead rotate (ie., flip x axis) as in older
                         versions.
     --no-ticks          Don't include ticks.
@@ -110,7 +112,10 @@ r=pc(
     agg=not opts['--show'],
     flip=flip,
     rotate=rot,
-    orient=orient,);
+    orient=orient,
+    nofloor=opts['--nofloor'],
+    cmap=opts['--cmap'],
+);
 
 if opts['--highlight'] and opts['--highlight'] != "None" and opts['--highlight'] != 'none':
     myhi  = float(opts['--highlight']);

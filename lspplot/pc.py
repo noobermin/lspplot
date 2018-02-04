@@ -57,6 +57,10 @@ def pc(q,p=None,**kw):
       rotate -- rotate x and y.
       flip   -- flips x and y. mimics behavior before
                 version 0.0.12.
+      nofloor -- raise error if there are no values > 0.0. Otherwise,
+                 proceed but raise the floor on the quantity.
+      nocopy  -- copies q so keep from modifying the passed quantity.
+                 Unset to save memory but be aware of side-effects.
 
     Returns:
       A dictionary with axes, pcolormesh object,
@@ -76,10 +80,10 @@ def pc(q,p=None,**kw):
         kw['axes'] = plt.axes();
     ret={};
     ax = ret['axes'] = kw['axes'];
-    if test(kw, 'lims'):
-        mn, mx = kw['lims'];
-    else:
-        mn, mx = None, None
+    mn, mx = None, None
+    if test(kw, 'lims'): mn, mx = kw['lims'];
+    if not test(kw, 'nocopy'):
+        q=np.copy(q);
     if test(kw,'log'):
         if mn is not None and (mn<0 or test(kw,"force_symlog")):
             linthresh = getkw('linthresh');
@@ -90,11 +94,17 @@ def pc(q,p=None,**kw):
         else:
             norm= LogNorm();
             if len(q[ q > 0.0 ]) == 0:
-                raise ValueError("quantity has no values greater than zero with log");
-            floor = q[ q > 0.0 ].min();
-            if mn is not None:
-                floor = min(mn,floor);
-            q[q <= 0.0] = floor;
+                errmsg="quantity has no values greater than zero with log";
+                if test(kw, 'nofloor') or mn is None:
+                    raise ValueError(errmsg);
+                print("warning: {}".format(errmsg));
+                print("setting all values to min");
+                q[:] = mn;
+            else:
+                floor = q[ q > 0.0 ].min();
+                if mn is not None:
+                    floor = min(mn,floor);
+                q[q <= 0.0] = floor;
     else:
         norm= None;
     if p == None:

@@ -34,6 +34,7 @@ Options:
     --linscale=L        Set the linear threshold for SymLogPlot [default: 1.0]
     --cmap=CMAP         Set the colormap. [default: viridis]
     --equal -E          Make spatial dimensions equal.
+    --nofloor           Raise an error if there are no positive values for log.
     --flip -F           Flip instead rotate (ie., flip x axis) as in older
                         versions.
     --no-ticks          Don't include ticks.
@@ -133,6 +134,7 @@ r=pc(
     linscale=float(opts['--linscale']),
     flip=flip,
     rotate=rot,
+    nofloor=opts['--nofloor'],
     cmap=opts['--cmap'],
 );
 

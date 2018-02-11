@@ -1,14 +1,14 @@
 from setuptools import setup
 
 setup(name='lspplot',
-      version='0.1.1',
+      version='0.1.1r1',
       description='lsp plots',
       url='http://github.com/noobermin/lspplot',
       author='noobermin',
       author_email='ngirmang.1@osu.com',
       license='MIT',
       install_requires=[
-          'pys>=0.0.10',
+          'pys=0.0.10',
           'lspreader>=0.1.7',
           'matplotlib>=2.0.0',
           'numpy>=1.10.4',

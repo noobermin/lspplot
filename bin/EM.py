@@ -65,7 +65,8 @@ from docopt import docopt;
 import numpy as np;
 import numpy.linalg as lin;
 from pys import parse_ftuple, parse_ituple, parse_ctuple, parse_stuple;
-from pys import fltrx_s, srx_s, rgbrx_s, quote_subs
+from pys import parse_colors, parse_qs;
+from pys import fltrx, isrx;
 from lspreader.flds import read_indexed, restrict
 from lspplot.sclr import S, E_energy,B_energy,EM_energy, vector_norm, smooth2Dp;
 from lspplot.pc import pc, highlight, trajectories;
@@ -79,17 +80,6 @@ elif opts['--zip']:
     gzip = True;
 else:
     gzip = 'guess';
-
-def parseit(s,rx=fltrx_s,parsef=parse_ftuple,quote=False):
-    ''' helper for parsing tuples '''
-    #this needs to be match! not search to not match parens.
-    if re.match(rx, s):
-        if quote:
-            s = quote_subs(s);
-        return [eval(s)]
-    else:
-        return parsef(s, length=None);
-    
 
 quantity = opts['--quantity'];
 quantities = dict(
@@ -142,9 +132,9 @@ titlestr=quantities[quantity]['title']
 units=quantities[quantity]['units']
 
 if opts['--target']:
-    svar = parseit(opts['--targetq'], rx=srx_s,parsef=parse_stuple,quote=True)
+    Q = parse_qs(opts['--targetq'], rx=isrx, length=None, quote=True);
     #unique
-    svar = list(set(svar));
+    svar = list(set(Q));
 else:
     svar = None;
 #####################################
@@ -266,15 +256,10 @@ if opts['--target']:
     if opts['--target'] == 'True':
         H = [1.7e21];
     else:
-        H = parseit(opts['--target']);
-    rgbrx_s = r"\( *(?:{numrx} *, *){{{rep1}}}{numrx} *,{{0,1}} *\)".format(
-        rep1=2,
-        numrx=fltrx_s);
-    crx_s = "(?:{srx}|{rgbrx})".format(srx=srx_s,rgbrx=rgbrx_s);
-    
-    C = parseit(opts['--targetc'], rx=crx_s, parsef=parse_ctuple, quote=True);
-    Q = parseit(opts['--targetq'], rx=srx_s, parsef=parse_stuple, quote=True);
-    A = parseit(opts['--targeta']);
+        H = parse_qs(opts['--target'], fltrx, length=None);
+    Q = Q; #just for nice symmetry
+    C = parse_colors(opts['--targetc'], length=None);
+    A = parse_qs(opts['--targeta'], fltrx,length=None);
     def lenl(I):
         if len(I) == 1:
             I = I*len(H);

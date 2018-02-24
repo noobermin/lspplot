@@ -108,7 +108,7 @@ def pc(q,p=None,**kw):
     else:
         norm= None;
     if p == None:
-        p = np.arange(q.shape[0]), np.arange(q.shape[1]);
+        p = np.arange(q.shape[1]), np.arange(q.shape[0]);
     x,y=p;
     ret['x'],ret['y'] = p;
     if test(kw, 'flip') or test(kw,'rotate'):

@@ -20,7 +20,9 @@ def readfiles(i,flds=None,sclr=None,
               gzip=True, dir='.',vector_norms=True,
               keep_xs=False,
               gettime=False):
-    
+    '''
+    Deprecated. Do not use.
+    '''
     fldsname = '{}/flds{}.p4{}'.format(
         dir, i, '.gz' if gzip else '');
     sclrname = '{}/sclr{}.p4{}'.format(
@@ -132,7 +134,25 @@ def smooth2D(d,l,
     return smooth2Dp(
         d[l], (d['x'], d[yl]), s, w,
         type=type,mode=mode, clip=True);
-    
+
+def _axis(i):
+    dims=['x','y','z']
+    if type(i) == str:
+        return (dims.index(i),i);
+    return i,dims[i];
+def flatten3d_aa(d, q, coord, dx=1e-4, axis='z',**kw):
+    '''
+    Flatten 3d arrays which along an axis. Averages over
+    a width of dx.
+    '''
+    if type(axis) != tuple: axis  = _axis(axis);
+    i,axis = axis[:2];
+    good = d[axis] <= coord + dx/2.0;
+    good&= d[axis] >= coord - dx/2.0;
+    if type(q) == str:
+        return np.average(d[q][good], axis=i);
+    else:
+        return [np.average(d[iq][good], axis=i) for iq in q];
 
 
 def E_energy(d):

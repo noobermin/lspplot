@@ -21,7 +21,7 @@ Options:
                        B_norm, B_energy, EM_energy, and S. [default: E_energy]
     --dir=D -D D       Read from this dir [default: .]
     --restrict=R       Restrict it.
-    --x-restrict=R     Restrict by positions as a 4 tuple.
+    --x-restrict=R     Restrict by positions as a 4 tuple, units of microns.
     --target=D -t D    Plot contours of this density. If D is a list,
                        plot multiple contours.
     --targetc=C        Set these colors for the contours. If C is a list,
@@ -60,6 +60,10 @@ Options:
     --traj-newfmt      Use the new trajectory format.
     --traj-qinvpow=P   Use an inverse power for the charge to alpha instead of
                        linear easing. [default: 2.0]
+    --3d-flataxis=Z    For 3D data, flatten this axis. [default: z]
+    --3d-coord=X       For 3D data, average at this coordinate (in microns) of the 
+                       flattened axis. [default: 0]
+    --3d-width=D       For 3D data, average over this width. [default: 1]
 '''
 from docopt import docopt;
 import numpy as np;
@@ -69,6 +73,7 @@ from pys import parse_colors, parse_qs;
 from pys import fltrx, isrx;
 from lspreader.flds import read_indexed, restrict
 from lspplot.sclr import S, E_energy,B_energy,EM_energy, vector_norm, smooth2Dp;
+from lspplot.sclr import flatten3d_aa;
 from lspplot.pc import pc, highlight, trajectories;
 from lspplot.physics import c,mu0,e0;
 import re;
@@ -145,7 +150,16 @@ d = read_indexed(int(opts['<i>']),
               gettime=True,vector_norms=False);
 t  = d['t'];
 #choosing positions
-ylabel =  'z' if np.isclose(d['y'].max(),d['y'].min()) else 'y';
+if len(d['x'].shape) == 1:
+    raise ValueError("You want a 2D plot of 1D data???");
+if len(d['x'].shape) == 2:
+    ylabel =  'z' if np.isclose(d['y'].max(),d['y'].min()) else 'y';
+else:
+    #compress
+    flataxis = opts['--3d-flataxis']
+    coord    = float(opts['--3d-coord'])*1e-4; #in cm
+    dx       = float(opts['--3d-width'])*1e-4;
+    #flatten3d_aa(
 if opts['--x-restrict']:
     res = parse_ftuple(opts['--x-restrict'], length=4);
     res[:2] = [ np.abs(d['x'][:,0]*1e4 - ires).argmin() for ires in res[:2] ];

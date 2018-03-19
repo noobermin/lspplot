@@ -119,8 +119,8 @@ def pc(q,p=None,**kw):
     ret['rotate'] = test(kw, 'rotate');
     mypc = ret['pc'] =ax.pcolormesh(
         x,y,q,vmin=mn,vmax=mx,cmap=getkw('cmap'),norm=norm);
-    #if test(kw, 'rotate'):
-    #    ret['axes'].invert_xaxis();
+    if test(kw, 'rotate'):
+        ret['axes'].invert_xaxis();
     if 'cbar' in kw and kw['cbar'] is False:
         ret['cbar'] = cbar = None;
     else:

@@ -45,7 +45,7 @@ import numpy.linalg as lin;
 from pys import parse_ftuple, parse_ituple;
 from lspreader.flds import read_indexed, restrict
 from lspplot.sclr import S;
-from lspplot.pc import pc,highlight;
+from lspplot.pc import pc,highlight, timelabel;
 from lspplot.physics import c,mu0,e0;
 import re
 opts = docopt(__doc__,help=True);
@@ -124,11 +124,9 @@ if opts['--flip']:
 else:
     rot,flip = True, False;
 #plot the density
-toff = float("--t-offset");
-title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6+toff);
 r=pc(
     q,(x,y), lims=(mn,mx),log=opts['--log10'],
-    clabel=units, title=title,
+    clabel=units, title=titlestr,
     agg=not opts['--show'],
     linthresh=float(opts['--linthresh']),
     linscale=float(opts['--linscale']),
@@ -150,7 +148,14 @@ if opts['--laser']:
     highlight(r, I, q=laser,
               color="red", alpha=0.15);
     
-import matplotlib.pyplot as plt;
+import matplotlib.pyplot as plt
+toff=float(opts['--t-offset']);
+timelabel(
+    r,
+    'time={:.2f} fs'.format(t*1e6+toff),
+    size=11,
+    color='white');
+
 if opts['--equal']:
     plt.axis('equal');
     r['axes'].autoscale(tight=True);

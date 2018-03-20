@@ -74,7 +74,7 @@ from pys import fltrx, isrx;
 from lspreader.flds import read_indexed, restrict
 from lspplot.sclr import S, E_energy,B_energy,EM_energy, vector_norm, smooth2Dp;
 from lspplot.sclr import flatten3d_aa;
-from lspplot.pc import pc, highlight, trajectories;
+from lspplot.pc import pc, highlight, trajectories, timelabel;
 from lspplot.physics import c,mu0,e0;
 import re;
 
@@ -160,6 +160,7 @@ else:
     coord    = float(opts['--3d-coord'])*1e-4; #in cm
     dx       = float(opts['--3d-width'])*1e-4;
     #flatten3d_aa(
+
 if opts['--x-restrict']:
     res = parse_ftuple(opts['--x-restrict'], length=4);
     res[:2] = [ np.abs(d['x'][:,0]*1e4 - ires).argmin() for ires in res[:2] ];
@@ -248,11 +249,9 @@ if opts['--flip']:
 else:
     rot,flip = True, False;
 #plot the density
-toff=float(opts['--t-offset']);
-title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6+toff);
 r=pc(
     q,(x,y), lims=(mn,mx),log=opts['--log10'],
-    clabel=units, title=title,
+    clabel=units, title=titlestr,
     agg=not opts['--show'],
     linthresh=float(opts['--linthresh']),
     linscale=float(opts['--linscale']),
@@ -334,6 +333,13 @@ if opts['--traj']:
         color_quantity=cf);
 
 import matplotlib.pyplot as plt;
+toff=float(opts['--t-offset']);
+timelabel(
+    r,
+    'time={:.2f} fs'.format(t*1e6+toff),
+    size=11,
+    color='white');
+
 if opts['--equal']:
     plt.axis('equal');
     r['axes'].autoscale(tight=True);

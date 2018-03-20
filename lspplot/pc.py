@@ -115,11 +115,11 @@ def pc(q,p=None,**kw):
     if test(kw, 'flip') or test(kw, 'rotate'):
         q=q;
         x,y=y,x;
-    ret['flip'] = test(kw, 'flip') #or test(kw,'rotate');
+    ret['flip'] = test(kw, 'flip');
     ret['rotate'] = test(kw, 'rotate');
     mypc = ret['pc'] =ax.pcolormesh(
         x,y,q,vmin=mn,vmax=mx,cmap=getkw('cmap'),norm=norm);
-    if test(kw, 'rotate'):
+    if ret['rotate']:
         ret['axes'].invert_xaxis();
     if 'cbar' in kw and kw['cbar'] is False:
         ret['cbar'] = cbar = None;
@@ -149,6 +149,26 @@ def pc(q,p=None,**kw):
     ax.set_ylabel(getkw("ylabel"));
     ax.set_title(getkw("title"));
     return ret;
+
+def timelabel(ret, s,loc='lower right',**kw):
+    '''
+    Create a label somewhere. Useful for time.
+    
+    Arguments:
+      ret   -- dict returned from pc.
+        s   -- your string
+    
+    Keyword Arguments:
+       loc  -- location. For now, lower right is implemented.
+       **kw -- keywords for call to text.
+    '''
+    if loc != 'lower right':
+        raise NotImplementedError("Will implement when I'm not lazy");
+    if loc == 'lower right':
+        ret['axes'].text(
+            0.01, 0.02, s,
+            transform=ret['axes'].transAxes,
+            **kw);
 
 def highlight(ret, val,
               q=None, color='white', alpha=0.15, erase=False):

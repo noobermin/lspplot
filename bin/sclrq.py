@@ -37,9 +37,9 @@ from docopt import docopt;
 import numpy as np;
 import numpy.linalg as lin;
 from pys import parse_ftuple, parse_ituple;
-from lspreader.flds import read_indexed, restrict
+from lspreader.flds import read_indexed, restrict;
 from lspplot.sclr import S;
-from lspplot.pc import pc,highlight;
+from lspplot.pc import pc,highlight,timelabel;
 from lspplot.physics import c,mu0,e0;
 
 opts = docopt(__doc__,help=True);
@@ -93,9 +93,6 @@ else:
 
 
 #plot the density
-toff = float(opts['--t-offset']);
-title="{}\nTime: {:.2f} fs".format(titlestr,t*1e6 + toff);
-
 #orientation of colorbar
 if opts['--orientation'] == "V":
     orient = "vertical"
@@ -108,7 +105,7 @@ else:
 
 r=pc(
     q,(x,y), lims=(mn,mx),log=opts['--log10'],
-    clabel=units, title=title,
+    clabel=units, title=titlestr,
     agg=not opts['--show'],
     flip=flip,
     rotate=rot,
@@ -131,6 +128,13 @@ if opts['--laser']:
               color="red", alpha=0.15);
     
 import matplotlib.pyplot as plt;
+toff=float(opts['--t-offset']);
+timelabel(
+    r,
+    'time={:.2f} fs'.format(t*1e6+toff),
+    size=11,
+    color='white');
+
 if opts['--equal']:
     plt.axis('equal');
     r['axes'].autoscale(tight=True);

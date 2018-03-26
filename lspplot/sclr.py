@@ -71,13 +71,16 @@ def flatten3d_aa(d, q=None, coord=0.0, dx=1e-4, axis='z',**kw):
     good&= d[axis] >= coord - dx/2.0;
     if type(q) == str:
         return np.average(d[q][good], axis=i);
+    shape = list(good.shape)
+    shape[i] = -1;
+    shape = tuple(shape);
     if q is None:
         for k in d:
             if k=='t': continue;
-            d[k] = np.average(d[k][good],axis=i);
+            d[k] = np.average(d[k][good].reshape(shape),axis=i);
         return d;
     else:
-        return [np.average(d[iq][good], axis=i) for iq in q];
+        return [np.average(d[iq][good].shape(shape), axis=i) for iq in q];
 
 
 def E_energy(d):

@@ -165,6 +165,12 @@ else:
     if flataxis=='x':
         xlabel='y';
         ylabel='z';
+    elif flataxis=='y':
+        xlabel='x';
+        ylabel='z';
+    else:
+        xlabel='x';
+        ylabel='y';
     coord = float(opts['--3d-coord'])*1e-4;
     dx = float(opts['--3d-width'])*1e-4;
     d=flatten3d_aa(d,coord=coord, dx=dx,axis=flataxis);

@@ -73,6 +73,7 @@ def flatten3d_aa(d, q=None, coord=0.0, dx=1e-4, axis='z',**kw):
         return np.average(d[q][good], axis=i);
     if q is None:
         for k in d:
+            if k=='t': continue;
             d[k] = np.average(d[k][good],axis=i);
         return d;
     else:

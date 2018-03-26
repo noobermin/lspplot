@@ -63,7 +63,7 @@ Options:
     --3d-flataxis=Z    For 3D data, flatten this axis. [default: z]
     --3d-coord=X       For 3D data, average at this coordinate (in microns) of the 
                        flattened axis. [default: 0]
-    --3d-width=D       For 3D data, average over this width. [default: 1]
+    --3d-width=D       For 3D data, average over this width in microns [default: 1]
 '''
 from docopt import docopt;
 import numpy as np;
@@ -144,11 +144,16 @@ else:
     svar = None;
 #####################################
 #reading data
-d = read_indexed(int(opts['<i>']),
-    flds=fvar,sclr=svar,
-    gzip=gzip,dir=opts['--dir'],
-              gettime=True,vector_norms=False);
+d = read_indexed(
+    int(opts['<i>']),
+    flds=fvar,
+    sclr=svar,
+    gzip=gzip,
+    dir=opts['--dir'],
+    gettime=True,
+    vector_norms=False);
 t  = d['t'];
+xlabel='x'
 #choosing positions
 if len(d['x'].shape) == 1:
     raise ValueError("You want a 2D plot of 1D data???");
@@ -157,13 +162,17 @@ if len(d['x'].shape) == 2:
 else:
     #compress
     flataxis = opts['--3d-flataxis']
-    coord    = float(opts['--3d-coord'])*1e-4; #in cm
-    dx       = float(opts['--3d-width'])*1e-4;
-    #flatten3d_aa(
-
+    if flataxis=='x':
+        xlabel='y';
+        ylabel='z';
+    coord = float(opts['--3d-coord'])*1e-4;
+    dx = float(opts['--3d-width'])*1e-4;
+    d=flatten3d_aa(d,coord=coord, dx=dx,axis=flataxis);
+    del d[flataxis];
+    
 if opts['--x-restrict']:
     res = parse_ftuple(opts['--x-restrict'], length=4);
-    res[:2] = [ np.abs(d['x'][:,0]*1e4 - ires).argmin() for ires in res[:2] ];
+    res[:2] = [ np.abs(d[xlabel][:,0]*1e4 - ires).argmin() for ires in res[:2] ];
     res[2:] = [ np.abs(d[ylabel][0,:]*1e4 - ires).argmin() for ires in res[2:] ];
     #including the edges
     res[1]+=1;
@@ -230,7 +239,7 @@ if opts['--traj']:
 
 ####################################
 #massaging data
-x,y = d['x']*1e4,d[ylabel]*1e4
+x,y = d[xlabel]*1e4,d[ylabel]*1e4
 q = read(d);
 
 if opts['--blur']:
@@ -327,7 +336,7 @@ if opts['--traj']:
         r, tr,
         alpha=alphaf,
         lw=1,
-        coords = [ylabel,'x'],
+        coords = [ylabel,xlabel],
         cmap   = cmap,
         scale  = (1e4,1e4),
         color_quantity=cf);

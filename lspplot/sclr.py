@@ -60,7 +60,7 @@ def _axis(i):
     if type(i) == str:
         return (dims.index(i),i);
     return i,dims[i];
-def flatten3d_aa(d, q, coord, dx=1e-4, axis='z',**kw):
+def flatten3d_aa(d, q=None, coord=0.0, dx=1e-4, axis='z',**kw):
     '''
     Flatten 3d arrays which along an axis. Averages over
     a width of dx.
@@ -71,6 +71,10 @@ def flatten3d_aa(d, q, coord, dx=1e-4, axis='z',**kw):
     good&= d[axis] >= coord - dx/2.0;
     if type(q) == str:
         return np.average(d[q][good], axis=i);
+    if q is None:
+        for k in d:
+            d[k] = np.average(d[k][good],axis=i);
+        return d;
     else:
         return [np.average(d[iq][good], axis=i) for iq in q];
 

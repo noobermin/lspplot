@@ -1055,7 +1055,7 @@ ListedColormap = colors.ListedColormap;
 cmaps={
     name: ListedColormap(data, name=name)
     for data,name in zip(
-            [_magma_data,_inferno_data,_plasma_data],
+            [_magma_data,_inferno_data,_plasma_data,_viridis],
             ['magma','inferno','plasma','viridis'])
 };
 magma = cmaps['magma']

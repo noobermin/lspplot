@@ -37,7 +37,9 @@ Options:
     --nofloor          Raise an error if there are no positive values for log.
     --flip -F          Flip instead rotate (ie., flip x axis) as in older
                        versions.
-    --blur=R           Blur with this radius.
+    --blur=R           Blur with this radius in microns.
+    --blur-width=W     Set the width of the kernel. Default is 6x the blur
+                       radius.
     --t-offset=T       Set time offset in fs. [default: 0].
     --traj=F           Plot trajectories from this file. If not used,
                        will not plot trajectories.
@@ -250,9 +252,10 @@ q = read(d);
 
 if opts['--blur']:
     rad = float(opts['--blur']);
-    w=rad*6;
+    w = rad*6;
+    if opts['--blur-width']: w = float(opts['--blur-width']);
     q,x,y = smooth2Dp(
-        q, (x,y), [0.1,0.1], [0.6,0.6]);
+        q, (x,y), [rad,rad], [w,w]);
     
 #####################################
 #plotting

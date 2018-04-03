@@ -271,7 +271,7 @@ def angular(d, phi=None, e=None,
     if test(kw,'ax'):
         ax = kw['ax']
     else:
-        ax = plt.subplot(projection='polar',axisbg='white');
+        ax = plt.subplot(projection='polar',facecolor='white');
     norm = matplotlib.colors.LogNorm() if test(kw,'log_q') else None;
     ax.set_rmax(maxE);
     surf=plt.pcolormesh(
@@ -306,7 +306,7 @@ def angular(d, phi=None, e=None,
                  lw=1, ls='--');
     ax.set_theta_zero_location('N');
     ax.patch.set_alpha(0.0);
-    ax.set_axis_bgcolor('red');
+    ax.set_facecolor('red');
     rlabel_str = '{} ' + runit;
     #text outlines.
     _,ts=plt.rgrids(rlabels,

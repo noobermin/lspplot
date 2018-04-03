@@ -38,8 +38,8 @@ def smooth2Dp(q, p, s, w,
     ret=convolve(q,kern,mode=mode);
     #someone tell me why
     if clip: ret[ret<0]=0;
-    offx=(x.shape[0]-ret.shape[0])/2;
-    offy=(y.shape[1]-ret.shape[1])/2;
+    offx=(x.shape[0]-ret.shape[0])//2;
+    offy=(y.shape[1]-ret.shape[1])//2;
     return ret, x[offx:-offx,offy:-offy], y[offx:-offx,offy:-offy];
 
                  

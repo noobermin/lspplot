@@ -136,7 +136,7 @@ def pc(q,p=None,**kw):
         ticks   = np.concatenate( (
             -10.0**negpows, [0.0], 10.0**pospows));
         tlabels = (
-            [ "-10$^{{{}}}$".format(int(p)) for p in negpows]
+            [ "$-$10$^{{{}}}$".format(int(p)) for p in negpows]
             + ['0']
             + [" 10$^{{{}}}$".format(int(p)) for p in pospows]);
         #ugh...

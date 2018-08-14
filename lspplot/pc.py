@@ -138,7 +138,7 @@ def pc(q,p=None,**kw):
         tlabels = (
             [ "$-$10$^{{{}}}$".format(int(p)) for p in negpows]
             + ['0']
-            + [" 10$^{{{}}}$".format(int(p)) for p in pospows]);
+            + ["$+$10$^{{{}}}$".format(int(p)) for p in pospows]);
         #ugh...
         if cbar:
             cbar.set_ticks(ticks);

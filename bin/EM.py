@@ -31,7 +31,7 @@ Options:
     --targetq=Q        Set the target quantity. If Q is a list
                        plot multiple quantities. [default: RhoN10]
     --linthresh=L      Set the linear threshold for SymLogPlot [default: 1e7]
-    --linscale=L       Set the linear threshold for SymLogPlot [default: 1e7]
+    --linscale=L       Set the linear threshold for SymLogPlot [default: 1.0]
     --cmap=CMAP        Set the colormap. [default: viridis]
     --equal -E         Make spatial dimensions equal.
     --nofloor          Raise an error if there are no positive values for log.

@@ -97,7 +97,7 @@ def smooth2D(d,l,
     s=ndme(s);
     w=ndme(w);
     yl =  'y' if 'y' in d else 'z';
-    ret,p smooth(
+    ret,p = smooth(
         d[l], (d['x'], d[yl]), s, w,
         type=type,mode=mode, clip=True);
     return ret, p[0], p[1];

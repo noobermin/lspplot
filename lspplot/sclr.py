@@ -12,25 +12,35 @@ from pys import parse_ftuple,test,takef;
 from lspplot.physics import c,e0,mu0;
 
 
-def twodme(x):
+
+def ndme(x,n=2):
     if type(x) == float:
-        x = np.array([x,x]);
+        x = np.array([x]*n);
     return x;
-def smooth2Dp(q, p, s, w,
-              type='gauss',
-              mode='valid',
-              clip=True):
-    if len(q.shape)>2:
-        raise ValueError("Only for 2D");
-    x,y = p;
-    dx = np.abs(x[1,0]-x[0,0]);
-    dy = np.abs(y[0,1]-y[0,0]);
+
+
+def smooth(q, p, s, w,
+           type='gauss',
+           mode='valid',
+           clip=True,
+           zeroshift=True):
+    N = len(q.shape);
+    s = ndme(s, n=N);
+    w = ndme(w, n=N);
+    dxs = [ np.abs(ix[1]-ix[0]) for ix in p ];
+    qmn = 0;
+    if zeroshift and q.min() < 0.0:
+        qmn = q.min();
+        q -= qmn;
     if type=='gauss':
-        X,Y=np.mgrid[-w[0]/2.0:w[0]/2.0:dx,
-                     -w[1]/2.0:w[1]/2.0:dy]
+        P = [ 
+            np.arange(-iw/2.0, iw/2.0+idx, idx) for iw,idx in zip(w, dxs)
+        ]
+        P = np.meshgrid(*P, indexing='ij');
+        arg = np.sum([ 0.5*(X/si)**2 for X,si in zip(P,s) ],axis=0);
+        kern = np.exp(-arg);
+        kern[:] = kern/np.sum(kern);
         #gaussian kernel, of course
-        kern = np.exp(-( (X/s[0])**2 + (Y/s[1])**2)/2.0 );
-        kern = kern/np.sum(kern);
     else:
         raise ValueError('Unknown type "{}"'.format(type));
     if mode!='valid':
@@ -38,9 +48,45 @@ def smooth2Dp(q, p, s, w,
     ret=convolve(q,kern,mode=mode);
     #someone tell me why
     if clip: ret[ret<0]=0;
-    offx=(x.shape[0]-ret.shape[0])//2;
-    offy=(y.shape[1]-ret.shape[1])//2;
-    return ret, x[offx:-offx,offy:-offy], y[offx:-offx,offy:-offy];
+    def div2(i):
+        r = i//2;
+        return r,-(r+i%2);
+    offs = [ div2(len(ix) - shi) for ix,shi in zip(p, ret.shape) ];
+    p = [ ix[st:en] for ix,(st,en) in zip(p,offs) ];
+    ret += qmn;
+    return ret, p;
+
+def getrestr_aax(ix,ir):
+    '''create a slice using the bounding range ir of ix, with ir upper bound is open'''
+    out = np.where(np.logical_and(ir[0] <= ix, ix < ir[1]))[0];
+    return slice(out[0],out[-1]+1);
+
+def getrestr_aa(ix,ir):
+    '''create a slice using the bounding range ir of ix'''
+    out = np.where(np.logical_and(ir[0] <= ix, ix <= ir[1]))[0];
+    return slice(out[0],out[-1]+1);
+
+def restrict_grid(lims,grid,include_sup=False):
+    '''restrict a grid to a cubeoid specified by lims:
+         lims ~= (zmin,zmax,ymin,ymax,xmin,xmax)
+         grid ~= (zs,ys,xs)
+       returns (zs,ys,xs), (kg,jg,ig)
+       
+       keywords:
+       ========
+       
+       include_sup -- the top of the restricted grid will be
+                      the upper edge of the grid (supremum)
+    '''
+    rs = chunks(lims,2);
+    gs = [ getrestr_aa(xs,ir)
+           for xs,ir in zip(grid,rs) ];
+    def _up(slc): return slice(slc.start,slc.stop+1);
+    if include_sup:
+        xs = [ xgrid[_up(g)] for g,xgrid in zip(gs,grid) ];
+    else:
+        xs = [ xgrid[g] for g,xgrid in zip(gs,grid) ];
+    return xs, gs;
 
                  
 def smooth2D(d,l,
@@ -48,12 +94,13 @@ def smooth2D(d,l,
              type='gauss',
              mode='valid',
              clip=True):
-    s=twodme(s);
-    w=twodme(w);
+    s=ndme(s);
+    w=ndme(w);
     yl =  'y' if 'y' in d else 'z';
-    return smooth2Dp(
+    ret,p smooth(
         d[l], (d['x'], d[yl]), s, w,
         type=type,mode=mode, clip=True);
+    return ret, p[0], p[1];
 
 def _axis(i):
     dims=['x','y','z']
@@ -83,6 +130,44 @@ def flatten3d_aa(d, q=None, coord=0.0, dx=1e-4, axis='z',**kw):
         return [np.average(d[iq][good].shape(shape), axis=i) for iq in q];
 
 
+def lspunits(q):
+    if "E" in q:
+        return 511e5
+    elif "B" in q:
+        return 1704.5
+    elif "J" in q:
+        return 1356.4
+    elif "RhoN" in q:
+        return 2.82396e11;
+    if "qp" in q:
+        return 4.5245e-2*1e-6;
+    else:
+        raise ValueError("quantity not known: {}".format(q));
+    pass;
+
+def basicstats(d):
+    pos = d > 0.0;
+    ret = dict(
+        shape=d.shape,
+        min=np.min(d),
+        max=np.max(d),
+        avg=np.average(d),
+        anynan=np.any(np.isnan(d)),);
+    if np.max(pos) == False:
+        ret.update(
+            avgpos=None,
+            minpos=None,);
+    else:
+        ret.update(
+            avgpos=np.average(d[pos]),
+            minpos=np.min(d[pos]));
+    return ret;
+
+def guess_step(s):
+    m=re.search('([0-9]+)[A-Z,a-z,_].*\.np[yz]',s);
+    if m: return int(m.group(1));
+
+    
 def E_energy(d):
     return e0*(vector_norm(d,'E')*1e5)**2/2.0*1e-6;
 def B_energy(d):

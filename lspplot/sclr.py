@@ -2,9 +2,6 @@
 '''
 For plotting sclr/flds files.
 '''
-from lspreader import read;
-from lspreader.flds import vector_norm, getvector, restrict
-from lspreader.lspreader import get_header;
 from scipy.signal import convolve;
 import numpy as np;
 import numpy.linalg as lin;
@@ -167,14 +164,116 @@ def guess_step(s):
     m=re.search('([0-9]+)[A-Z,a-z,_].*\.np[yz]',s);
     if m: return int(m.group(1));
 
+def getvector(d, k, sel=None, unit='lsp'):
+    '''
+    Get a vector from a dictionary of quantities. That is
+     ~ [dx,dy,dz] 
+
+    Parameters:
+    -----------
+
+    d -- object (npz file, dictionary)
+    k -- key for the data.
+
     
-def E_energy(d):
-    return e0*(vector_norm(d,'E')*1e5)**2/2.0*1e-6;
-def B_energy(d):
-    return (vector_norm(d,'B')*1e-4)**2/(mu0*2.0)*1e-6;
-def EM_energy(d):
-    return (E_energy(d) + B_energy(d))
-def S(d):
-    E = getvector(d,'E');
-    B = getvector(d,'B');
+    Keywords:
+    ---------
+
+    sel -- slices to pass after key selection
+    unit-- Unit to multiply by. 'lsp' for to reckon lsp units.
+    '''
+
+    if sel:
+        ret = np.array([
+            d[k + 'x'][sel],
+            d[k + 'y'][sel],
+            d[k + 'z'][sel],]);
+    else:
+        ret = np.array([
+            d[k + 'x'],
+            d[k + 'y'],
+            d[k + 'z'],]);
+    if unit == 'lsp':
+        unit = lspunits(k);
+    ret *= unit;
+    return ret;
+
+            
+def vector_sq(d, k, sel=None, unit='lsp'):
+    '''
+    Get the vector square from a dictionary of quantities. That is
+     ~ dx**2+dy**2+dz**2 
+
+    Parameters:
+    -----------
+
+    d -- object (npz file, dictionary)
+    k -- key for the data.
+
+    
+    Keywords:
+    ---------
+
+    sel -- slices to pass after key selection
+    unit-- Unit to multiply by. 'lsp' for to reckon lsp units.
+    '''
+    if sel:
+        ret = np.abs(d[k + 'x'][sel])**2
+        ret+= np.abs(d[k + 'y'][sel])**2
+        ret+= np.abs(d[k + 'z'][sel])**2
+    else:
+        ret = np.abs(d[k + 'x'])**2
+        ret+= np.abs(d[k + 'y'])**2
+        ret+= np.abs(d[k + 'z'])**2
+    if unit == 'lsp':
+        unit = lspunits(k)
+    ret *= unit;
+    return ret;
+def vector_norm(d, k, sel=None, unit='lsp'):
+        '''
+    Get the vector square from a dictionary of quantities. That is
+     ~ np.sqrt(dx**2+dy**2+dz**2)
+
+    Parameters:
+    -----------
+
+    d -- object (npz file, dictionary)
+    k -- key for the data.
+
+    
+    Keywords:
+    ---------
+
+    sel -- slices to pass after key selection
+    unit-- Unit to multiply by. 'lsp' for to reckon lsp units.
+    '''
+    return np.sqrt(vector_sq(d,k,sel=sel,unit=unit));
+
+
+def E_energy(d,sel=None,unit='lsp'):
+    '''Get the electric field energy from a dictionary of quantities in SI'''
+    return e0*(vector_sq(d,'E',sel=sel,unit=unit)*1e5)**2/2.0*1e-6;
+
+def B_energy(d,sel=None,unit='lsp'):
+    '''Get the magnetic field energy from a dictionary of quantities in SI'''
+    return (vector_sq(d,'B',sel=sel)*1e-4)**2/(mu0*2.0)*1e-6;
+
+def EM_energy(d,sel=None,unit='lsp',E_unit=None, B_unit=None):
+    '''Get electromagnetic field energy from a dictionary of quantities in SI'''
+    if unit == 'lsp':
+        E_unit=B_unit='lsp';
+    elif not E_unit is None or B_unit is None:
+        raise ValueError(
+            "must supply units for E_unit and B_unit if unit not set to lsp")
+    return E_energy(d,sel=sel,unit=E_unit) + B_energy(d,sel=sel,unit=B_unit);
+
+def S(d,unit='lsp',E_unit=None,B_unit=None):
+    '''get norm of the poyting vector from a dictionary of quantities in SI'''
+    if unit == 'lsp':
+        E_unit=B_unit='lsp';
+    elif not E_unit is None or B_unit is None:
+        raise ValueError(
+            "must supply units for E_unit and B_unit if unit not set to lsp")
+    E = getvector(d,'E',unit=E_unit);
+    B = getvector(d,'B',unit=B_unit);
     return lin.norm(np.cross(E*1e5,B*1e-4,axis=0),axis=0)/mu0*1e-4;

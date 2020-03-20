@@ -230,7 +230,7 @@ def vector_sq(d, k, sel=None, unit='lsp'):
     ret *= unit;
     return ret;
 def vector_norm(d, k, sel=None, unit='lsp'):
-        '''
+    '''
     Get the vector square from a dictionary of quantities. That is
      ~ np.sqrt(dx**2+dy**2+dz**2)
 

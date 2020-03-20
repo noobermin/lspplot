@@ -113,7 +113,7 @@ def pc(q,p=None,**kw):
     ret['x'],ret['y'] = p;
     ret['q']  = q;
     if test(kw, 'flip') or test(kw, 'rotate'):
-        q=q;
+        q=q.T;
         x,y=y,x;
     ret['flip'] = test(kw, 'flip');
     ret['rotate'] = test(kw, 'rotate');

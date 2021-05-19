@@ -451,8 +451,8 @@ def _prepkw(opts):
         else:
             return defaults[label];
     kw = {
-        'angle_bins' : float(opts['--angle-bins']),
-        'energy_bins': float(opts['--energy-bins']),
+        'angle_bins' : int(opts['--angle-bins']),
+        'energy_bins': int(opts['--energy-bins']),
         'max_q': float(opts['--max-q']) if opts['--max-q'] else None,
         'min_q': float(opts['--min-q']) if opts['--min-q'] else None,
         'clabel' : opts['--clabel'],

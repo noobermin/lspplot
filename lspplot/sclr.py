@@ -5,7 +5,7 @@ For plotting sclr/flds files.
 from scipy.signal import convolve;
 import numpy as np;
 import numpy.linalg as lin;
-from pys import parse_ftuple,test,takef;
+from pys import parse_ftuple,test,takef,chunks;
 from lspplot.physics import c,e0,mu0;
 
 
@@ -74,6 +74,7 @@ def restrict_grid(lims,grid,include_sup=False):
        
        include_sup -- the top of the restricted grid will be
                       the upper edge of the grid (supremum)
+                      #this currently doesn't work...
     '''
     rs = chunks(lims,2);
     gs = [ getrestr_aa(xs,ir)
@@ -85,7 +86,18 @@ def restrict_grid(lims,grid,include_sup=False):
         xs = [ xgrid[g] for g,xgrid in zip(gs,grid) ];
     return xs, gs;
 
-                 
+def xtoi(x,grid):
+    '''get the index of a point in an grid'''
+    return np.array([ np.nonzero(np.isclose(ix,igrid))[0][0]
+                      for ix,igrid in zip(x,grid) ]);
+
+def regionsz(lims, grid):
+    ''' reckon size of cells of a rectangular prism of axis points '''
+    minI = xtoi(lims[::2], grid);
+    maxI = xtoi(lims[1::2],grid);
+    return maxI - minI;
+
+
 def smooth2D(d,l,
              s=1e-4,w=6e-4,
              type='gauss',
@@ -127,7 +139,7 @@ def flatten3d_aa(d, q=None, coord=0.0, dx=1e-4, axis='z',**kw):
         return [np.average(d[iq][good].shape(shape), axis=i) for iq in q];
 
 
-def lspunits(q):
+def lspunits(q,onerr=1.0):
     if "E" in q:
         return 511e5
     elif "B" in q:
@@ -136,11 +148,19 @@ def lspunits(q):
         return 1356.4
     elif "RhoN" in q:
         return 2.82396e11;
-    if "qp" in q:
+    elif "qp" in q:
         return 4.5245e-2*1e-6;
-    else:
+    
+    if onerr is None:
         raise ValueError("quantity not known: {}".format(q));
-    pass;
+    return onerr;
+    
+def recognized_lspunit(q):
+    good = 'E' in q or 'B' in q;
+    good|= 'J' in q;
+    good|= 'RhoN' in q;
+    good|= 'qp' in q;
+    return good;
 
 def basicstats(d):
     pos = d > 0.0;

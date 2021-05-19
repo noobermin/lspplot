@@ -107,7 +107,7 @@ def pc(q,p=None,**kw):
                 q[q <= 0.0] = floor;
     else:
         norm= None;
-    if p == None:
+    if p is None:
         p = np.arange(q.shape[1]), np.arange(q.shape[0]);
     x,y=p;
     ret['x'],ret['y'] = p;
@@ -159,54 +159,164 @@ def timelabel(ret, s,loc='lower right',**kw):
         s   -- your string
     
     Keyword Arguments:
-       loc  -- location. For now, lower right is implemented.
+       loc  -- location. For now, 'lower right' and 'upper right'
+               is implemented, or an explicit tuple of position of
+               x and y.
        **kw -- keywords for call to text.
     '''
-    if loc != 'lower right':
-        raise NotImplementedError("Will implement when I'm not lazy");
     if loc == 'lower right':
         ret['axes'].text(
             0.01, 0.02, s,
             transform=ret['axes'].transAxes,
             **kw);
+    elif loc == 'upper right':
+        ret['axes'].text(
+            0.01, 0.92, s,
+            transform=ret['axes'].transAxes,
+            **kw);
+    elif type(loc) == tuple:
+        x,y = loc[:2]
+        ret['axes'].text(
+            x, y, s,
+            transform=ret['axes'].transAxes,
+            **kw);
+        
+    else:
+        raise ValueError("unknown loc \"{}\"".format(loc));
+        #raise NotImplementedError("Will implement  when I'm not lazy");
+
+    pass
 
 def highlight(ret, val,
-              q=None, color='white', alpha=0.15, erase=False):
+              q=None,
+              p=None,
+              color='white', alpha=0.15,
+              erase=False, cbar_lines=True,
+              style='solid',
+              empty_safe=True):
     '''
     Highlight a pc. Essentially a wrapper of plt.contour
     
     Arguments:
       ret   -- dict returned from pc.
-      val   -- value to highlight
-      q     -- quantity to highlight. If None, highlight ret's quantity
+      val   -- value to highlight.
+      q     -- quantity to highlight. If None, highlight ret's quantity.
+      p     -- grid. If None, use ret's quantity's dimensions.
     
     Keyword Arguments:
-      color -- color of highlight
-      alpha -- alpha of highlight
-      erase -- erases the highlights. Defaults to false (opposite of matplotlib!)
+      color        -- color of highlight
+      alpha        -- alpha of highlight
+      cbar_lines   -- add lines to colorbar
+      erase        -- erases the highlights. Defaults to 
+                      false (opposite of matplotlib!)
     
     Returns:
       ret but with stuff that plt.contour adds.
     '''
     ax = ret['axes'];
-    x,y=ret['x'],ret['y'];
+    if p is None: p = ret['x'],ret['y'];
+    x,y = p;
     if q is None:
         q = ret['q'];
+    if empty_safe:
+        mx,mn = q.max(),q.min();
+        if val > mx or val < mn: return ret;
     if test(ret,'flip') or test(ret,'rotate'):
         x,y=y,x;
     #elif q is not ret['q'] and test(ret,'flip'):
-    if not test(ret, 'cbar'):
-        ret['cbar'] = plt.colorbar(ret['pc']);
-    cbar = ret['cbar'];
     if not test(ret, 'cts'):
         ret['cts'] = [];
     ct = ax.contour(x,y,q, [val],
-                    colors=[color], alpha = alpha);
+                    colors=[color], alpha = alpha,
+                    linestyles=style,);
     ret['cts'].append(ct);
-    if q is ret['q']:
-        cbar.add_lines(ct,erase=erase);
+    if cbar_lines and ret['cbar'] is not None and q is ret['q']:
+        ret['cbar'].add_lines(ct,erase=erase);
     return ret;
 
+def quiv(ret, uv,
+         C=None,
+         p=None,
+         color='black',
+         qscale=1.0,
+         maxscale=None,
+         norm=None,
+         copy=False,
+         skip=None,
+         scale=1.0,
+         scale_units='xy',
+         width=None,
+         **kw):
+    '''
+    Place a quiver on a pc. Essentially a wrapper of plt.quiver
+    
+    Arguments:
+      ret   -- dict returned from pc.
+      uv    -- pair to quiver
+      q     -- quantity to highlight. If None, highlight ret's quantity.
+      p     -- grid. If None, use ret's quantity's dimensions.
+    
+    Keyword Arguments:
+      C            -- quantity that maps to a colormap. Super
+                      cedes `color` (see matplotlib.pyplot.quiver)
+      color        -- color of arrows
+      qscale       -- not to be confused with scale. My only flavor of
+                      quiver scaling.
+      maxscale     -- set the maximum length of vectors.
+      norm         -- provide norm in order to keep from calculating it.
+      copy         -- copy u and v to avoid modifying the vector.
+      skip         -- two tuple of skips along each dimension in p's
+                      units.
+      scale        -- argument passed to Axes.quiver. Use `qscale`
+                      instead [default: 1.0]
+      scale_units  -- argument passed to Axes.quiver. [default 'xy']
+      width        -- argument passed to Axes.quiver.
+
+    
+    Returns:
+      ret but with stuff that plt.contour adds.
+    '''
+    ax = ret['axes'];
+    if p is None: p = ret['x'],ret['y'];
+    x,y = p;
+    u,v = uv;
+    if copy:
+        u = np.copy(u);
+        v = np.copy(v);
+    if maxscale is not None:
+        if norm is None: norm = np.sqrt(u**2+v**2);
+        if maxscale == 0.0: raise ValueError(
+                "dont quiver a zero maxscale");
+        sel = norm > maxscale;
+        s = maxscale/norm[sel];
+        u[sel]*= s;
+        v[sel]*= s;
+    dx = x[1]-x[0];
+    dy = y[1]-y[0];
+    if skip:
+        xskip,yskip = skip;
+        xskip = np.round(xskip/dx).astype(int);
+        yskip = np.round(yskip/dy).astype(int);
+    else:
+        xskip,yskip=1,1;
+    xp = x[::xskip];
+    yp = y[::yskip];
+    
+    u  = u[::yskip, ::xskip]/qscale*dx;
+    v  = v[::yskip, ::xskip]/qscale*dy;
+    #matplotlib developers should get covid19 and die
+    args = [xp,yp,u,v];
+    if C is not None: args+=[C];
+    qv = ax.quiver(*args,
+                   scale=scale,
+                   color=color,
+                   scale_units='xy',
+                   **kw);
+    if not test(ret, 'quivs'):
+        ret['quivs'] = [];
+    ret['quivs'].append(qv);
+    return ret;
+    
 trajdefaults = dict(
     alpha = None,
     coords= ['x','y'],

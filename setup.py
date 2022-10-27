@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='lspplot',
-      version='0.1.6r1',
+      version='0.1.7',
       description='lsp plots',
       url='http://github.com/noobermin/lspplot',
       author='noobermin',
@@ -10,7 +10,7 @@ setup(name='lspplot',
       install_requires=[
           'pys>=0.0.12r1',
           'lspreader>=0.1.7',
-          'matplotlib>=2.0.0',
+          'matplotlib>=3.0.0',
           'numpy>=1.10.4',
           'scipy>=0.18.1'],
       packages=['lspplot'],

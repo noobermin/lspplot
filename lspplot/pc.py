@@ -10,6 +10,7 @@ import numpy as np;
 import numpy.linalg as lin;
 from pys import parse_ftuple,test,takef,mk_getkw;
 from lspplot.physics import c,e0,mu0;
+import re;
 
 pc_defaults = dict(
     xlabel='microns',
@@ -22,6 +23,18 @@ pc_defaults = dict(
     orient='vertical',
 )
 
+def natlabel(v,fmt='1.1e'):
+    f,p = np.modf(np.log10(v));
+    if np.isclose(f,0.0):
+        return f"10$^{{{int(p):d}}}$"
+    else:
+        return exptolabel(v,fmt);
+
+def exptolabel(v,fmt='1.1e'):
+    s = f'{v:{fmt}}'
+    s = re.sub("e","$\\\times$10$^{",s);
+    s = s + "}$"
+    return s;
 
 def pc(q,p=None,**kw):
     '''
@@ -54,6 +67,9 @@ def pc(q,p=None,**kw):
       clabel -- set colorbar label
       orient -- the orientation for the colorbar.
       cmap   -- set the colormap.
+      norm   -- manually set the norm.
+      discrete_10 -- Use levels of log10 for the norm and colormap, making it
+                     a discrete color map.
       rotate -- rotate x and y.
       flip   -- flips x and y. mimics behavior before
                 version 0.0.12.
@@ -72,6 +88,8 @@ def pc(q,p=None,**kw):
             return kw[l];
         return pc_defaults[l];
     from matplotlib.colors import LogNorm,SymLogNorm;
+    from matplotlib.colors import BoundaryNorm,LinearSegmentedColormap;
+    from matplotlib import cm;
     import matplotlib;
     if test(kw,"agg"):
         matplotlib.use("agg");
@@ -80,11 +98,41 @@ def pc(q,p=None,**kw):
         kw['axes'] = plt.axes();
     ret={};
     ax = ret['axes'] = kw['axes'];
-    mn, mx = None, None
+    mn, mx = None, None;
+    vmin,vmax = None, None;
+    if test(kw, 'lim') and not test(kw,'lims'):
+        kw['lims'] = kw['lim'];
     if test(kw, 'lims'): mn, mx = kw['lims'];
     if not test(kw, 'nocopy'):
         q=np.copy(q);
-    if test(kw,'log'):
+    cmap = getkw('cmap');
+    if test(kw, 'norm'):
+        norm = kw['norm'];
+    elif test(kw,'discrete_10'):
+        if mn < 0 or test(kw, "force_symlog"):
+            raise NotImplementedError(
+                "need to implement symlog for discrete_10");
+        mnf,mnw = np.modf(np.log10(mn));
+        mxf,mxw = np.modf(np.log10(mx));
+        pows   = np.arange(mnw,mxw+1)
+        levels = 10**pows;
+        levels[0] = mn;
+        if not np.isclose(mxf,0.0):
+            levels = np.concatenate((levels,[mx]));
+        if type(cmap) == str:
+            cmap = cm.get_cmap(cmap);
+        if len(levels) > cmap.N:
+            raise ValueError( (
+                f"you want to use discrete_10 with this many log10 levels?"
+                f" (len(levels) == {len(levels)}) > (cmap.N == {cmap.N})"))
+        di = cmap.N // len(levels);
+        #up to the end
+        st = cmap.N - di*len(levels);
+        colors = [ cmap(i) for i in range(st,cmap.N) ];
+        cmap = LinearSegmentedColormap.from_list(
+            'Discrete cmap', colors, len(colors));
+        norm = BoundaryNorm(levels, cmap.N);
+    elif test(kw,'log'):
         if mn is not None and (mn<0 or test(kw,"force_symlog")):
             linthresh = getkw('linthresh');
             norm = SymLogNorm(
@@ -92,7 +140,7 @@ def pc(q,p=None,**kw):
                 linscale=getkw('linscale'),
                 vmin=mn,vmax=mx);
         else:
-            norm= LogNorm();
+            norm= LogNorm(vmin=mn,vmax=mx);
             if len(q[ q > 0.0 ]) == 0:
                 errmsg="quantity has no values greater than zero with log";
                 if test(kw, 'nofloor') or mn is None:
@@ -107,6 +155,7 @@ def pc(q,p=None,**kw):
                 q[q <= 0.0] = floor;
     else:
         norm= None;
+        vmin,vmax=mn,mx;
     if p is None:
         p = np.arange(q.shape[1]), np.arange(q.shape[0]);
     x,y=p;
@@ -117,8 +166,12 @@ def pc(q,p=None,**kw):
         x,y=y,x;
     ret['flip'] = test(kw, 'flip');
     ret['rotate'] = test(kw, 'rotate');
-    mypc = ret['pc'] =ax.pcolormesh(
-        x,y,q,vmin=mn,vmax=mx,cmap=getkw('cmap'),norm=norm);
+    #developers developers developers
+    if norm is not None:
+        ret['pc'] =ax.pcolormesh(x,y,q,cmap=cmap,norm=norm);
+    else:
+        ret['pc'] =ax.pcolormesh(x,y,q,vmin=vmin,vmax=vmax,cmap=cmap);
+    mypc = ret['pc'];
     if ret['rotate']:
         ret['axes'].invert_xaxis();
     if 'cbar' in kw and kw['cbar'] is False:
@@ -143,6 +196,12 @@ def pc(q,p=None,**kw):
         if cbar:
             cbar.set_ticks(ticks);
             cbar.set_ticklabels(tlabels);
+    elif type(norm) is BoundaryNorm:
+        ticks   = levels
+        tlabels = [ natlabel(v) for v in levels ];
+        if cbar:
+            cbar.set_ticks(ticks);
+            cbar.set_ticklabels(tlabels);
     if test(kw,"clabel") and cbar:
         cbar.set_label(getkw("clabel"));
     ax.set_xlabel(getkw("xlabel"));
@@ -150,7 +209,7 @@ def pc(q,p=None,**kw):
     ax.set_title(getkw("title"));
     return ret;
 
-def timelabel(ret, s,loc='lower right',**kw):
+def timelabel(ret, s,loc='lower right',fig=False,**kw):
     '''
     Create a label somewhere. Useful for time.
     
@@ -162,29 +221,25 @@ def timelabel(ret, s,loc='lower right',**kw):
        loc  -- location. For now, 'lower right' and 'upper right'
                is implemented, or an explicit tuple of position of
                x and y.
+       fig  -- use figtext instead of axes.text
        **kw -- keywords for call to text.
     '''
-    if loc == 'lower right':
-        ret['axes'].text(
-            0.01, 0.02, s,
-            transform=ret['axes'].transAxes,
-            **kw);
+    import matplotlib.pyplot as plt;
+    if   loc == 'lower right':
+        x, y = 0.01, 0.02;
     elif loc == 'upper right':
-        ret['axes'].text(
-            0.01, 0.92, s,
-            transform=ret['axes'].transAxes,
-            **kw);
+        x, y = 0.01, 0.92;
     elif type(loc) == tuple:
         x,y = loc[:2]
+    else:
+        raise ValueError("unknown loc \"{}\"".format(loc));
+    if fig:
+        plt.figtext(x, y, s,**kw);
+    else:
         ret['axes'].text(
             x, y, s,
             transform=ret['axes'].transAxes,
             **kw);
-        
-    else:
-        raise ValueError("unknown loc \"{}\"".format(loc));
-        #raise NotImplementedError("Will implement  when I'm not lazy");
-
     pass
 
 def highlight(ret, val,
